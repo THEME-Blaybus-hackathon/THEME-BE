@@ -19,7 +19,7 @@ logging.level.org.springframework.security=DEBUG
 logging.level.com.example.Project=DEBUG
 
 # JWT Configuration
-jwt.secret=CHANGE_THIS_TO_YOUR_OWN_BASE64_ENCODED_SECRET_KEY
+jwt.secret=YOUR_SECRET_KEY
 jwt.access-token-validity=3600000
 jwt.refresh-token-validity=604800000
 
@@ -53,6 +53,6 @@ sns.naver.token.url=https://nid.naver.com/oauth2.0/token
 sns.naver.userinfo.url=https://openapi.naver.com/v1/nid/me
 
 # OpenAI Configuration
-openai.api.key=YOUR_OPENAI_API_KEY
+openai.api.key=YOUR_AI_KEY
 openai.api.model=gpt-5-mini
 openai.api.url=https://api.openai.com/v1/chat/completions
