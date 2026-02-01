@@ -1,0 +1,58 @@
+spring.application.name=Project
+
+# Database Configuration (H2 for development)
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# JPA Configuration
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Logging
+logging.level.org.springframework.security=DEBUG
+logging.level.com.example.Project=DEBUG
+
+# JWT Configuration
+jwt.secret=CHANGE_THIS_TO_YOUR_OWN_BASE64_ENCODED_SECRET_KEY
+jwt.access-token-validity=3600000
+jwt.refresh-token-validity=604800000
+
+# Swagger Configuration
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.tags-sorter=alpha
+springdoc.swagger-ui.operations-sorter=alpha
+
+# OAuth Configuration - Google
+sns.google.url=https://accounts.google.com/o/oauth2/v2/auth
+sns.google.client.id=YOUR_GOOGLE_CLIENT_ID
+sns.google.client.secret=YOUR_GOOGLE_CLIENT_SECRET
+sns.google.callback.url=http://localhost:8080/auth/google/callback
+sns.google.token.url=https://oauth2.googleapis.com/token
+sns.google.userinfo.url=https://www.googleapis.com/oauth2/v2/userinfo
+
+# OAuth Configuration - Kakao
+sns.kakao.url=https://kauth.kakao.com/oauth/authorize
+sns.kakao.client.id=YOUR_KAKAO_REST_API_KEY
+sns.kakao.callback.url=http://localhost:8080/auth/kakao/callback
+sns.kakao.token.url=https://kauth.kakao.com/oauth/token
+sns.kakao.userinfo.url=https://kapi.kakao.com/v2/user/me
+
+# OAuth Configuration - Naver
+sns.naver.url=https://nid.naver.com/oauth2.0/authorize
+sns.naver.client.id=YOUR_NAVER_CLIENT_ID
+sns.naver.client.secret=YOUR_NAVER_CLIENT_SECRET
+sns.naver.callback.url=http://localhost:8080/auth/naver/callback
+sns.naver.token.url=https://nid.naver.com/oauth2.0/token
+sns.naver.userinfo.url=https://openapi.naver.com/v1/nid/me
+
+# OpenAI Configuration
+openai.api.key=YOUR_OPENAI_API_KEY
+openai.api.model=gpt-5-mini
+openai.api.url=https://api.openai.com/v1/chat/completions

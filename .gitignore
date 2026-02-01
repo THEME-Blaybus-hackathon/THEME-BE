@@ -1,0 +1,333 @@
+# Application properties with real keys
+application.properties
+src/main/resources/application.properties
+src/test/resources/application.properties
+**/application.properties
+**/application-*.properties
+!**/application.properties.example
+
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
+
+# Secret files
+secrets/
+secret.*
+*.secret
+*.key
+*.pem
+*.p12
+*.jks
+*.crt
+*.keystore
+
+# OpenAI API keys
+*openai*.key
+*api-key*
+
+# OAuth credentials
+*oauth*.json
+*credentials*.json
+client-secret.json
+oauth-credentials.json
+
+#------------------------------------------------------------------------------
+# 📝 DOCUMENTATION FILES (Exclude all except README and HELP)
+#------------------------------------------------------------------------------
+# Use wildcard patterns for consistency
+
+# Allow only README and HELP
+*.md
+!README.md
+!HELP.md
+*.MD
+!README.MD
+!HELP.MD
+
+# Specific documentation patterns (extra protection)
+*_GUIDE.md
+*_API.md
+*_SETUP.md
+*_RESULTS.md
+*_SUMMARY.md
+*_CHECKLIST.md
+*_FIX.md
+*_UPDATE.md
+*_IMPROVEMENT.md
+*_REMOVED.md
+AI_*.md
+API_*.md
+GPT5_*.md
+OAUTH_*.md
+KAKAO_*.md
+NAVER_*.md
+GOOGLE_*.md
+IMPLEMENTATION_*.md
+OPTIMIZATION_*.md
+CONTEXT_*.md
+FINAL_*.md
+HACKATHON_*.md
+PROJECT_*.md
+SETUP.md
+
+#------------------------------------------------------------------------------
+# 🔨 BUILD AND DEPENDENCY FILES
+#------------------------------------------------------------------------------
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# Maven (if applicable)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# JAR/WAR files
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+!gradle/wrapper/*.jar
+
+# Class files
+*.class
+
+#------------------------------------------------------------------------------
+# 💻 IDE AND EDITOR FILES
+#------------------------------------------------------------------------------
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains IDEs
+*.launch
+.metadata
+
+#------------------------------------------------------------------------------
+# 🖥️  OPERATING SYSTEM FILES
+#------------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+Icon
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+#------------------------------------------------------------------------------
+# 📊 LOG AND TEMPORARY FILES
+#------------------------------------------------------------------------------
+
+# Log files
+*.log
+*.log.*
+logs/
+log/
+server*.log
+app*.log
+spring*.log
+error*.log
+debug*.log
+access*.log
+application*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.cache
+*~
+*.orig
+*.rej
+
+# Test output
+*.pid
+*.seed
+*.pid.lock
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+#------------------------------------------------------------------------------
+# 🧪 TEST AND SCRIPT FILES
+#------------------------------------------------------------------------------
+
+# Shell scripts (except gradle wrapper)
+*.sh
+!gradlew
+!gradle/wrapper/*.sh
+
+# Batch files (except gradle wrapper)
+*.bat
+!gradlew.bat
+!gradle/wrapper/*.bat
+
+# Test results
+test-results/
+test-output/
+*.coverage
+.nyc_output/
+.jacoco/
+*.exec
+
+#------------------------------------------------------------------------------
+# 📦 PACKAGE MANAGERS AND DEPENDENCIES
+#------------------------------------------------------------------------------
+
+# Node modules (if frontend is added)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python (if scripts are added)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+#------------------------------------------------------------------------------
+# 🗄️  DATABASE FILES
+#------------------------------------------------------------------------------
+
+# H2 Database files
+*.db
+*.mv.db
+*.trace.db
+testdb.*
+*.h2.db
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Other databases
+*.mdb
+*.accdb
+
+#------------------------------------------------------------------------------
+# 🔧 CONFIGURATION OVERRIDES
+#------------------------------------------------------------------------------
+
+# Local configuration overrides
+application-local.properties
+application-dev.properties
+application-prod.properties
+application-secret.properties
+*-local.*
+*-override.*
+*-secret.*
+
+#------------------------------------------------------------------------------
+# 📸 MEDIA AND BINARY FILES (Optional)
+#------------------------------------------------------------------------------
+
+# Large media files (uncomment if needed)
+# *.mp4
+# *.avi
+# *.mov
+# *.wmv
+# *.flv
+
+# Images (uncomment if not needed in repo)
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# *.ico
+
+#------------------------------------------------------------------------------
+# 🚫 GENERATED AND CACHE FILES
+#------------------------------------------------------------------------------
+
+# Generated sources
+generated/
+.generated/
+
+# Cache directories
+.cache/
+cache/
+
+# Spring Boot DevTools
+.springBeans
+
+#------------------------------------------------------------------------------
+# END OF .gitignore
+#------------------------------------------------------------------------------
+
