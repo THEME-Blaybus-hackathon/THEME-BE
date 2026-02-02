@@ -43,6 +43,7 @@ public class SecurityConfig {
                         "/login",
                         "/signup",
                         "/oauth-signup",
+                        "/ai-test.html",
                         "/api/auth/login",
                         "/api/auth/refresh",
                         "/api/auth/google",

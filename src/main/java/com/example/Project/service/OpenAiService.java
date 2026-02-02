@@ -40,9 +40,10 @@ public class OpenAiService {
             requestBody.put("messages", messages);
 
             if (model.startsWith("gpt-5") || model.contains("gpt-4o")) {
-                requestBody.put("max_completion_tokens", 1500); // 대화 맥락 고려하여 증가
+                // GPT-5 mini: 최대 출력 토큰 128,000 (전체 컨텍스트 창 400,000)
+                requestBody.put("max_completion_tokens", 128000);
             } else {
-                requestBody.put("max_tokens", 500);
+                requestBody.put("max_tokens", 4096);
                 requestBody.put("temperature", 0.7);
             }
 

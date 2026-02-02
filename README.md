@@ -11,6 +11,118 @@
 
 @@ 기술 스택
 
+#### 1️⃣ 세션 기반 (웹 UI)
+- 이메일/비밀번호 로그인
+- 소셜 로그인 (Google, Kakao, Naver)
+- 브라우저 세션 쿠키 사용
+
+#### 2️⃣ JWT 토큰 (REST API)
+- JWT Access/Refresh Token
+- API 클라이언트용 (모바일, SPA)
+- **OAuth → JWT 연동 지원** ⭐ NEW
+
+### 🤖 AI 어시스턴트 기능 (NEW!)
+- **OpenAI GPT-4o** 기반 컨텍스트 인식 AI
+- **4가지 3D 엔지니어링 모델** 지원
+  - Jet Engine (제트 엔진)
+  - Suspension (차량 서스펜션)
+  - Robot Arm (로봇 팔)
+  - Vice (바이스)
+- **부품별 상세 설명** (3D 메시 선택 시)
+- **대화 컨텍스트 유지** (세션별, 객체별)
+- **학부 수준 기술 설명**
+
+### 🔐 보안 기능
+- Spring Security 7.0.2
+- BCrypt 비밀번호 암호화
+- Role 기반 권한 관리 (USER, ADMIN, PREMIUM)
+- JWT 토큰 인증/갱신
+
+### 📡 API 문서화
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- API Docs: http://localhost:8080/api-docs
+
+---
+
+## 🛠 기술 스택
+
+```
+Backend
+├── Spring Boot 3.4.2
+├── Spring Security 7.0.2
+├── Spring Data JPA
+├── JWT (JJWT 0.12.3)
+└── H2 Database
+
+AI & ML
+└── OpenAI GPT-5-mini API
+
+Documentation
+└── Swagger (SpringDoc OpenAPI 2.3.0)
+
+OAuth 2.0
+├── Google OAuth
+├── Kakao OAuth
+└── Naver OAuth
+```
+
+---
+
+## 📡 주요 엔드포인트
+
+### 🌐 웹 페이지
+```
+GET  /                      → 홈 (로그인 페이지)
+GET  /login                 → 로그인 페이지
+POST /login                 → 폼 로그인 처리
+GET  /signup                → 회원가입 페이지
+POST /signup                → 회원가입 처리
+GET  /dashboard             → 대시보드 (인증 필요)
+GET  /auth/{provider}       → OAuth 로그인 시작
+GET  /oauth-signup          → OAuth 추가 정보 입력
+```
+
+### 🔌 인증 API
+```
+POST /api/auth/login        → JWT 로그인
+POST /api/auth/refresh      → JWT 토큰 갱신
+GET  /api/auth/{provider}   → OAuth 소셜 로그인 (JWT) ⭐
+```
+
+### 🤖 AI 어시스턴트 API (NEW!)
+```
+POST   /api/ai/ask          → AI에게 질문하기
+DELETE /api/ai/history      → 대화 히스토리 삭제
+DELETE /api/ai/session      → 세션 전체 삭제
+```
+
+---
+
+## 📱 OAuth 소셜 로그인 사용법
+
+### 웹 클라이언트 (세션 방식)
+```javascript
+// 소셜 로그인 버튼 클릭
+window.location.href = '/auth/google';
+
+// 자동으로 세션 생성 후 대시보드로 이동
+```
+
+### API 클라이언트 (JWT 방식) ⭐ NEW
+```javascript
+// type=api 파라미터 추가
+window.location.href = '/api/auth/google?type=api';
+
+// JSON 응답으로 JWT 토큰 반환
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGc...",
+    "refreshToken": "eyJhbGc...",
+    "tokenType": "Bearer"
+  }
+}
+```
 - Java 17
 - Spring Boot 3.4.2
 - Spring Security
