@@ -1,64 +1,15 @@
-# 🚀 Spring Boot 인증/인가 + AI 어시스턴트 시스템
+@@ THE:ME Backend
 
-JWT + OAuth2.0 + OpenAI GPT-4o 기반 통합 플랫폼 (해커톤 준비용)
+3D 기반 공학 교육 플랫폼 백엔드 API
 
----
+@@ 주요 기능
 
-## ⚡ 빠른 시작
+- JWT 기반 사용자 인증
+- 소셜 로그인 (Google, Kakao, Naver)
+- AI 어시스턴트 (GPT-5-mini)
+- **3D 모델 에셋 스트리밍 및 메타데이터 API 제공** (New)
 
-```bash
-# 1. 프로젝트 빌드
-./gradlew clean build
-
-# 2. 환경 변수 설정 (필수!)
-export OPENAI_API_KEY=sk-proj-xxxxx
-
-# 3. 애플리케이션 실행
-./gradlew bootRun
-
-# 4. 브라우저에서 접속
-http://localhost:8080
-```
-
----
-
-## 📚 문서 목록
-
-### 🔧 설정 가이드
-- **[PROJECT_SETUP.md](PROJECT_SETUP.md)** ⭐ - **팀원용 환경 설정 가이드 (필독!)**
-  - 개발 환경 요구사항
-  - 프로젝트 시작 방법
-  - OAuth 클라이언트 등록
-  - 프로젝트 구조 설명
-  - 트러블슈팅
-
-### 📱 API 문서
-- **[API_OAUTH_GUIDE.md](API_OAUTH_GUIDE.md)** ⭐ - **OAuth → JWT 연동 가이드**
-  - 모바일/SPA용 소셜 로그인 구현
-  - 전체 플로우 및 예시 코드
-  - React Native, Android, iOS 예제
-  - 토큰 저장 및 갱신 방법
-
-- **[AI_ASSISTANT_API.md](AI_ASSISTANT_API.md)** 🤖 - **AI 어시스턴트 API 가이드 (신규!)**
-  - 3D 엔지니어링 모델 AI 설명
-  - 컨텍스트 인식 대화 시스템
-  - 4가지 모델 지원 (Jet Engine, Suspension, Robot Arm, Vice)
-  - 프론트엔드 통합 가이드
-
-### 🔐 OAuth 설정
-- [KAKAO_SETUP.md](KAKAO_SETUP.md) - 카카오 로그인 설정 가이드
-- [KAKAO_401_FIX.md](KAKAO_401_FIX.md) - 카카오 401 에러 해결
-- [KAKAO_EMAIL_REMOVED.md](KAKAO_EMAIL_REMOVED.md) - 카카오 이메일 처리
-
-### 🎯 개발 참고
-- [OAUTH_SIGNUP_IMPROVEMENT.md](OAUTH_SIGNUP_IMPROVEMENT.md) - OAuth 회원가입 개선 내역
-- [HACKATHON_CHECKLIST.md](HACKATHON_CHECKLIST.md) - 해커톤 체크리스트
-
----
-
-## 🎯 주요 기능
-
-### ✅ 인증 방식 (2가지)
+@@ 기술 스택
 
 #### 1️⃣ 세션 기반 (웹 UI)
 - 이메일/비밀번호 로그인
@@ -172,131 +123,102 @@ window.location.href = '/api/auth/google?type=api';
   }
 }
 ```
+- Java 17
+- Spring Boot 3.4.2
+- Spring Security
+- H2 Database
+- OpenAI API
 
-**자세한 내용:** [API_OAUTH_GUIDE.md](API_OAUTH_GUIDE.md)
+@@ 시작하기
 
----
+@@@ 요구사항
 
-## 🏗 프로젝트 구조
+- JDK 17 이상
+- Gradle
 
-```
-src/main/java/com/example/Project/
-├── config/
-│   ├── SecurityConfig.java          # Spring Security 설정
-│   └── SwaggerConfig.java            # Swagger 설정
-├── controller/
-│   ├── AuthController.java           # 웹 로그인/회원가입
-│   ├── OauthController.java          # OAuth 콜백 (세션 + JWT)
-│   └── api/
-│       └── AuthApiController.java    # JWT API
-├── security/
-│   ├── JwtTokenProvider.java         # JWT 생성/검증
-│   └── JwtAuthenticationFilter.java  # JWT 필터
-├── service/
-│   ├── AuthService.java              # 인증 비즈니스 로직
-│   ├── OauthService.java             # OAuth 서비스
-│   └── social/
-│       ├── GoogleOauth.java          # Google OAuth
-│       ├── KakaoOauth.java           # Kakao OAuth
-│       └── NaverOauth.java           # Naver OAuth
-├── entity/
-│   └── User.java                     # 사용자 엔티티
-└── dto/                              # 데이터 전송 객체
-```
+@@@ 설치
 
----
+git clone https://github.com/YOUR_USERNAME/SIMVEX-Backend.git
+cd SIMVEX-Backend
 
-## 🔑 환경 변수 설정
+@@@ 설정
 
-`src/main/resources/application.properties` 파일에서 아래 정보 설정:
+1. `application.properties.example` 복사 (필수)
+   **보안을 위해 실제 키는 포함되어 있지 않습니다. 복사 후 값을 채워주세요.**
 
-```properties
-# Google OAuth
-google.client.id=YOUR_GOOGLE_CLIENT_ID
-google.client.secret=YOUR_GOOGLE_CLIENT_SECRET
+cp src/main/resources/application.properties.example src/main/resources/application.properties
 
-# Kakao OAuth
-kakao.client.id=YOUR_KAKAO_REST_API_KEY
-kakao.client.secret=YOUR_KAKAO_CLIENT_SECRET  # (Optional)
 
-# Naver OAuth
-naver.client.id=YOUR_NAVER_CLIENT_ID
-naver.client.secret=YOUR_NAVER_CLIENT_SECRET
+2. API 키 설정 (`application.properties`)
 
-# JWT Secret (Production에서 변경 필수!)
-jwt.secret=YOUR_SECRET_KEY_BASE64
-```
+# OpenAI (GPT-5-mini)
+openai.api.key=your-key-here
 
-**자세한 설정:** [PROJECT_SETUP.md](PROJECT_SETUP.md)
+# JWT Secret Key
+jwt.secret=your-secret-key
 
----
+# Google OAuth (선택)
+sns.google.client.id=your-id
+sns.google.client.secret=your-secret
 
-## 🧪 테스트
+# Kakao OAuth (선택)
+sns.kakao.client.id=your-key
 
-### Swagger UI 사용
-```
-http://localhost:8080/swagger-ui.html
-```
+# Naver OAuth (선택)
+sns.naver.client.id=your-id
+sns.naver.client.secret=your-secret
 
-### H2 데이터베이스 콘솔
-```
-http://localhost:8080/h2-console
-JDBC URL: jdbc:h2:mem:testdb
-Username: sa
-Password: (비워두기)
-```
 
----
+@@@ 실행
 
-## 👥 팀원 온보딩
+./gradlew bootRun
 
-1. **[PROJECT_SETUP.md](PROJECT_SETUP.md)** 읽기 (필수)
-2. Java 17 설치 확인
-3. OAuth 클라이언트 ID/Secret 설정
-4. `./gradlew bootRun` 실행
-5. Swagger UI에서 API 테스트
+서버: http://localhost:8080
 
-**API 클라이언트 개발:** [API_OAUTH_GUIDE.md](API_OAUTH_GUIDE.md) 참고
+@@ API 문서
 
----
+Swagger UI: http://localhost:8080/swagger-ui.html
 
-## 📋 해커톤 체크리스트
+@@@ 주요 엔드포인트
 
-- [x] JWT 인증 시스템 ✅
-- [x] OAuth 소셜 로그인 (Google, Kakao, Naver) ✅
-- [x] **OAuth → JWT 연동** ✅ NEW
-- [x] Swagger API 문서화 ✅
-- [x] Role 기반 권한 관리 ✅
-- [x] 토큰 갱신 기능 ✅
-- [x] 신규/기존 사용자 분기 처리 ✅
+**인증**
+- `POST /api/auth/signup` - 회원가입
+- `POST /api/auth/signin` - 로그인
+- `GET /auth/{provider}` - OAuth 로그인
 
-**자세한 내용:** [HACKATHON_CHECKLIST.md](HACKATHON_CHECKLIST.md)
+**3D 모델 & 에셋 (New)**
+- `GET /api/objects?category={keyword}` - 모델 부품 리스트 및 메타데이터 조회
+- `GET /asset/{category}/{filename}` - 3D 파일(.glb) 및 이미지 직접 접근 (로그인 불필요)
 
----
+**AI 어시스턴트**
+- `POST /api/ai/ask` - 질문하기
 
-## 🐛 트러블슈팅
+{
+  "objectName": "drone",
+  "question": "프로펠러의 역할은?",
+  "sessionId": "user-123",
+  "selectedPart": "impeller_blade"
+}
 
-문제 발생 시:
-1. 콘솔 로그 확인
-2. H2 콘솔에서 DB 상태 확인
-3. Swagger UI로 API 테스트
-4. 관련 문서 참고
+@@ 지원 3D 모델 (API 키워드)
 
-**일반적인 문제:**
-- OAuth 401 에러 → [KAKAO_401_FIX.md](KAKAO_401_FIX.md)
-- 빌드 실패 → `./gradlew clean build --refresh-dependencies`
-- JWT 파싱 에러 → JJWT 버전 확인 (0.12.x)
+API 요청 시 `category` 파라미터에 아래 **소문자 키워드**를 사용하세요.
 
----
+| 모델명 | API 키워드 (`category`) |
+| 로봇 팔 | `robot_arm` |
+| 머신 바이스 | `machine_vice` |
+| 판 스프링 | `leaf_spring` |
+| 드론 | `drone` |
+| V4 엔진 | `v4_engine` |
+| 로봇 집게 | `robot_gripper` |
+| 서스펜션 | `suspension` |
 
-## 📞 문의
+@@ 개발
 
-프로젝트 관련 문의사항은 팀 채널에 공유해주세요!
+@@@ 빌드
 
----
+./gradlew build
 
-**마지막 업데이트:** 2026년 1월 30일  
-**버전:** 2.0.0 (OAuth → JWT 연동 추가)  
-**License:** MIT
+@@@ 테스트
 
-**Happy Hacking! 🎉**
+./gradlew test
