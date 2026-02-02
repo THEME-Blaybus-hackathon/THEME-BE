@@ -33,12 +33,7 @@ secret.*
 client-secret.json
 oauth-credentials.json
 
-#------------------------------------------------------------------------------
-# 📝 DOCUMENTATION FILES (Exclude all except README and HELP)
-#------------------------------------------------------------------------------
-# Use wildcard patterns for consistency
-
-# Allow only README and HELP
+# DOCUMENTATION FILES
 *.md
 !README.md
 !HELP.md
@@ -72,10 +67,6 @@ HACKATHON_*.md
 PROJECT_*.md
 SETUP.md
 
-#------------------------------------------------------------------------------
-# 🔨 BUILD AND DEPENDENCY FILES
-#------------------------------------------------------------------------------
-
 # Gradle
 .gradle/
 build/
@@ -85,7 +76,7 @@ build/
 gradle-app.setting
 .gradletasknamecache
 
-# Maven (if applicable)
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -105,10 +96,6 @@ release.properties
 
 # Class files
 *.class
-
-#------------------------------------------------------------------------------
-# 💻 IDE AND EDITOR FILES
-#------------------------------------------------------------------------------
 
 # IntelliJ IDEA
 .idea/
@@ -149,10 +136,6 @@ bin/
 *.launch
 .metadata
 
-#------------------------------------------------------------------------------
-# 🖥️  OPERATING SYSTEM FILES
-#------------------------------------------------------------------------------
-
 # macOS
 .DS_Store
 .DS_Store?
@@ -180,10 +163,6 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
-
-#------------------------------------------------------------------------------
-# 📊 LOG AND TEMPORARY FILES
-#------------------------------------------------------------------------------
 
 # Log files
 *.log
@@ -218,16 +197,12 @@ application*.log
 hs_err_pid*
 replay_pid*
 
-#------------------------------------------------------------------------------
-# 🧪 TEST AND SCRIPT FILES
-#------------------------------------------------------------------------------
-
-# Shell scripts (except gradle wrapper)
+# Shell scripts
 *.sh
 !gradlew
 !gradle/wrapper/*.sh
 
-# Batch files (except gradle wrapper)
+# Batch files
 *.bat
 !gradlew.bat
 !gradle/wrapper/*.bat
@@ -239,19 +214,19 @@ test-output/
 .nyc_output/
 .jacoco/
 *.exec
+ai-test.html
+**/ai-test.html
+test*.html
+demo*.html
 
-#------------------------------------------------------------------------------
-# 📦 PACKAGE MANAGERS AND DEPENDENCIES
-#------------------------------------------------------------------------------
-
-# Node modules (if frontend is added)
+# Node modules
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Python (if scripts are added)
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -260,10 +235,6 @@ ENV/
 env/
 env.bak/
 venv.bak/
-
-#------------------------------------------------------------------------------
-# 🗄️  DATABASE FILES
-#------------------------------------------------------------------------------
 
 # H2 Database files
 *.db
@@ -280,10 +251,6 @@ testdb.*
 *.mdb
 *.accdb
 
-#------------------------------------------------------------------------------
-# 🔧 CONFIGURATION OVERRIDES
-#------------------------------------------------------------------------------
-
 # Local configuration overrides
 application-local.properties
 application-dev.properties
@@ -292,10 +259,6 @@ application-secret.properties
 *-local.*
 *-override.*
 *-secret.*
-
-#------------------------------------------------------------------------------
-# 📸 MEDIA AND BINARY FILES (Optional)
-#------------------------------------------------------------------------------
 
 # Large media files (uncomment if needed)
 # *.mp4
@@ -312,10 +275,6 @@ application-secret.properties
 # *.bmp
 # *.ico
 
-#------------------------------------------------------------------------------
-# 🚫 GENERATED AND CACHE FILES
-#------------------------------------------------------------------------------
-
 # Generated sources
 generated/
 .generated/
@@ -326,8 +285,3 @@ cache/
 
 # Spring Boot DevTools
 .springBeans
-
-#------------------------------------------------------------------------------
-# END OF .gitignore
-#------------------------------------------------------------------------------
-

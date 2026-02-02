@@ -104,7 +104,7 @@ Backend
 └── H2 Database
 
 AI & ML
-└── OpenAI GPT-4o API
+└── OpenAI GPT-5-mini API
 
 Documentation
 └── Swagger (SpringDoc OpenAPI 2.3.0)
