@@ -26,7 +26,7 @@ public class AiAssistantService {
 
         if (!promptService.isValidObjectId(request.getObjectName())) {
             return AiAskResponse.of("Invalid object ID: " + request.getObjectName()
-                    + ". Supported: V4_ENGINE, JET_ENGINE, SUSPENSION, ROBOT_ARM, VICE, DRONE");
+                    + ". Supported: v4_engine, suspension, robot_gripper, robot_arm, machine_vice, leaf_spring, drone");
         }
 
         String systemPrompt = promptService.getSystemPrompt(request.getObjectName());
