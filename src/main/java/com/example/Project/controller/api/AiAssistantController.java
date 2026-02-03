@@ -31,7 +31,7 @@ public class AiAssistantController {
     @Operation(
             summary = "Ask AI about 3D model",
             description = "Send a question about a specific 3D engineering model. "
-            + "Supports: JET_ENGINE, SUSPENSION, ROBOT_ARM, VICE. "
+            + "Supports: v4_engine, suspension, robot_gripper, robot_arm, machine_vice, leaf_spring, drone. "
             + "Optional selectedPart parameter for part-specific explanations."
     )
     @PostMapping("/ask")

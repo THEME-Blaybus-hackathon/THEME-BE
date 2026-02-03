@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class AiAskRequest {
 
     private String sessionId;
-    private String objectName; // JET_ENGINE | SUSPENSION | ROBOT_ARM | VICE
+    private String objectName; // v4_engine | suspension | robot_gripper | robot_arm | machine_vice | leaf_spring | drone
     private String question;
     private String selectedPart; // nullable - specific mesh/part name
 }
