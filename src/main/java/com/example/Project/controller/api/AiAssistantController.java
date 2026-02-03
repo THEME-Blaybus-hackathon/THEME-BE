@@ -19,6 +19,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.example.Project.dto.PdfExportRequest;
+import com.example.Project.service.PdfExportService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 @Tag(name = "AI Assistant API", description = "Context-aware AI assistant for 3D engineering models")
 @RestController
 @RequestMapping("/api/ai")
@@ -27,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AiAssistantController {
 
     private final AiAssistantService aiAssistantService;
+    private final PdfExportService pdfExportService;
 
     @Operation(
             summary = "Ask AI about 3D model",
@@ -74,5 +80,22 @@ public class AiAssistantController {
 
         aiAssistantService.clearSession(sessionId);
         return ResponseEntity.ok(ApiResponse.success("Session cleared", "All chat history cleared for this session"));
+    }
+
+    @Operation(summary = "Export Chat & Memo to PDF", description = "Generate a PDF report containing user memo and chat history.")
+    @PostMapping("/report")
+    public ResponseEntity<byte[]> generateReport(@RequestBody PdfExportRequest request) {
+        log.info("PDF Generation Request | title: {}", request.getTitle());
+
+        byte[] pdfBytes = pdfExportService.generatePdf(request);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        
+        headers.setContentDispositionFormData("attachment", "report.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }
