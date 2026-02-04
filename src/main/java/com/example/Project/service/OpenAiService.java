@@ -33,16 +33,10 @@ public class OpenAiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    /**
-     * AI 대화용 - 짧은 응답에 최적화
-     */
     public String sendChatCompletion(List<ChatMessage> messages) {
         return sendChatCompletion(messages, false);
     }
 
-    /**
-     * Quiz 생성용 - 긴 JSON 응답에 최적화
-     */
     public String sendChatCompletionForQuiz(List<ChatMessage> messages) {
         return sendChatCompletion(messages, true);
     }
@@ -54,13 +48,9 @@ public class OpenAiService {
             requestBody.put("messages", messages);
 
             if (model.startsWith("gpt-5") || model.contains("gpt-4o")) {
-                // GPT-5는 temperature를 지원하지 않음 (기본값 1만 사용)
                 if (isQuizGeneration) {
-                    // OX Quiz 생성: reasoning (3000) + JSON response (2000) = 5000 total
-                    // 4지선다보다 OX가 훨씬 짧으므로 토큰 절약
                     requestBody.put("max_completion_tokens", 5000);
                 } else {
-                    // AI 대화: reasoning (2000) + response (1000) = 3000 total (비용 절감)
                     requestBody.put("max_completion_tokens", 3000);
                 }
             } else {
@@ -131,8 +121,7 @@ public class OpenAiService {
         }
         messages.add(ChatMessage.system(enhancedSystemPrompt));
 
-        // 히스토리 추가 (최근 것만, 대화가 길어지면 토큰 절약)
-        int maxHistoryMessages = 4; // 최근 2 Q&A (4개 메시지) - reasoning 토큰 고려
+        int maxHistoryMessages = 4;
         int startIndex = Math.max(0, history.size() - maxHistoryMessages);
         messages.addAll(history.subList(startIndex, history.size()));
 

@@ -15,10 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * 테스트 데이터 생성 컨트롤러 (개발/테스트 전용)
- */
-@Tag(name = "Test Data API", description = "테스트용 목 데이터 생성 API")
+@Tag(name = "Test Data API", description = "테스트 데이터 생성")
 @RestController
 @RequestMapping("/api/test-data")
 @RequiredArgsConstructor
@@ -27,10 +24,7 @@ public class TestDataController {
 
     private final WrongAnswerNoteRepository wrongAnswerNoteRepository;
 
-    @Operation(
-            summary = "오답 노트 목 데이터 생성",
-            description = "테스트용 오답 노트 샘플 데이터를 생성합니다."
-    )
+    @Operation(summary = "테스트용 오답 노트 생성", description = "샘플 오답 노트 3개 생성")
     @PostMapping("/wrong-answers/mock")
     public ResponseEntity<String> createMockWrongAnswers() {
         log.info("Creating mock wrong answer notes...");
@@ -76,7 +70,7 @@ public class TestDataController {
                 .explanation("피스톤링은 연소실의 가스 누설을 방지하고 압축을 유지하는 중요한 역할을 합니다.")
                 .category("피스톤/밀폐")
                 .objectName("v4_engine")
-                .createdAt(Instant.now().minusSeconds(3600))  // 1시간 전
+                .createdAt(Instant.now().minusSeconds(3600)) // 1시간 전
                 .reviewed(false)
                 .build();
 
