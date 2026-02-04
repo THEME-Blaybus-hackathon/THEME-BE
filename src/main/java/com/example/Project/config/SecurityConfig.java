@@ -57,6 +57,9 @@ public class SecurityConfig {
                         "/api/auth/naver",
                         "/api/ai/**",
                         "/api/ai-assistant/**",
+                        "/api/quiz/**",
+                        "/api/wrong-answers/**",  // 오답 노트 API 허용
+                        "/api/test-data/**",  // 테스트 데이터 API 허용
                         "/h2-console/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",

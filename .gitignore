@@ -44,31 +44,9 @@ oauth-credentials.json
 !README.MD
 !HELP.MD
 
-# Specific documentation patterns (extra protection)
-*_GUIDE.md
-*_API.md
-*_SETUP.md
-*_RESULTS.md
-*_SUMMARY.md
-*_CHECKLIST.md
-*_FIX.md
-*_UPDATE.md
-*_IMPROVEMENT.md
-*_REMOVED.md
-AI_*.md
-API_*.md
-GPT5_*.md
-OAUTH_*.md
-KAKAO_*.md
-NAVER_*.md
-GOOGLE_*.md
-IMPLEMENTATION_*.md
-OPTIMIZATION_*.md
-CONTEXT_*.md
-FINAL_*.md
-HACKATHON_*.md
-PROJECT_*.md
-SETUP.md
+# Markdown
+*.md
+!README.md
 
 # Gradle
 .gradle/
@@ -221,6 +199,24 @@ ai-test.html
 **/ai-test.html
 test*.html
 demo*.html
+
+# User data files (quiz results, PDFs, etc.)
+*.pdf
+!**/docs/*.pdf
+!**/documentation/*.pdf
+quiz*.json
+*_quiz*.json
+*quiz_*.json
+quiz_gen.json
+quiz_response.json
+*_study_report.pdf
+study_report*.pdf
+test_report*.pdf
+
+# HTML files (frontend/templates - backend developer)
+*.html
+!**/static/index.html
+!**/public/index.html
 
 # Node modules
 node_modules/
