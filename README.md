@@ -232,9 +232,13 @@ POST /api/ai/report - PDF 리포트 다운로드
 
 ## 지원 3D 모델 (API 키워드)
 
-API 요청 시 category 또는 objectName 파라미터에 아래 소문자 키워드를 사용하세요.
-
 | 모델명 | API 키워드 (category) | | 로봇 팔 | robot_arm | | 머신 바이스 | machine_vice | | 판 스프링 | leaf_spring | | 드론 | drone | | V4 엔진 | v4_engine | | 로봇 집게 | robot_gripper | | 서스펜션 | suspension | | 제트 엔진 | jet_engine |
+
+### PDF & Report | Method | Endpoint | Description | | :--- | :--- | :--- | | POST | /api/ai/report | AI 대화 내역 + 메모 병합 PDF 다운로드 | | POST | /api/export-pdf | (Legacy) PDF 내보내기 |
+
+### 3D Assets & Metadata | Method | Endpoint | Description | | :--- | :--- | :--- | | GET | /api/objects | 카테고리별 부품 메타데이터 조회 | | GET | /asset/{category}/{filename} | 3D 모델(.glb) 및 이미지 파일 스트리밍 |
+
+### OAuth (API Mode) | Method | Endpoint | Description | | :--- | :--- | :--- | | GET | /api/auth/{provider}?type=api | 소셜 로그인 시 HTML 대신 JWT JSON 반환 |
 
 ## 개발
 

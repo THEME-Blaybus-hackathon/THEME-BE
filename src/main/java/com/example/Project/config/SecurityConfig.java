@@ -64,7 +64,9 @@ public class SecurityConfig {
                         "/error",
                         "/api/objects",
                         "/asset/**",
-                        "/models/**"
+                        "/models/**",
+                        "/api/memos/**",
+                        "/api/export-pdf/**"
                 ).permitAll()
                 // 관리자만 접근 가능한 경로
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
