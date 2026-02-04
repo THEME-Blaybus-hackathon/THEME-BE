@@ -33,15 +33,36 @@ public class OpenAiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    /**
+     * AI 대화용 - 짧은 응답에 최적화
+     */
     public String sendChatCompletion(List<ChatMessage> messages) {
+        return sendChatCompletion(messages, false);
+    }
+
+    /**
+     * Quiz 생성용 - 긴 JSON 응답에 최적화
+     */
+    public String sendChatCompletionForQuiz(List<ChatMessage> messages) {
+        return sendChatCompletion(messages, true);
+    }
+
+    private String sendChatCompletion(List<ChatMessage> messages, boolean isQuizGeneration) {
         try {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("model", model);
             requestBody.put("messages", messages);
 
             if (model.startsWith("gpt-5") || model.contains("gpt-4o")) {
-                // GPT-5 mini: 최대 출력 토큰 128,000 (전체 컨텍스트 창 400,000)
-                requestBody.put("max_completion_tokens", 2000);
+                // GPT-5는 temperature를 지원하지 않음 (기본값 1만 사용)
+                if (isQuizGeneration) {
+                    // OX Quiz 생성: reasoning (3000) + JSON response (2000) = 5000 total
+                    // 4지선다보다 OX가 훨씬 짧으므로 토큰 절약
+                    requestBody.put("max_completion_tokens", 5000);
+                } else {
+                    // AI 대화: reasoning (2000) + response (1000) = 3000 total (비용 절감)
+                    requestBody.put("max_completion_tokens", 3000);
+                }
             } else {
                 requestBody.put("max_tokens", 4096);
                 requestBody.put("temperature", 0.7);
