@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 오답 노트 API 컨트롤러
  */
-@Tag(name = "Wrong Answer Note API", description = "오답 노트 관리 API")
+@Tag(name = "Wrong Answer Note API", description = "오답 노트 관리")
 @RestController
 @RequestMapping("/api/wrong-answers")
 @RequiredArgsConstructor
@@ -31,23 +31,15 @@ public class WrongAnswerNoteController {
 
     private final WrongAnswerNoteService wrongAnswerNoteService;
 
-    @Operation(
-            summary = "오답 노트 전체 조회",
-            description = "특정 사용자의 모든 오답 노트를 조회합니다."
-    )
+    @Operation(summary = "오답 노트 전체 조회", description = "사용자의 모든 오답 노트 조회")
     @GetMapping
-    public ResponseEntity<List<WrongAnswerNote>> getWrongAnswers(
-            @RequestParam String userId
-    ) {
+    public ResponseEntity<List<WrongAnswerNote>> getWrongAnswers(@RequestParam String userId) {
         log.info("Get wrong answers | userId: {}", userId);
         List<WrongAnswerNote> notes = wrongAnswerNoteService.getWrongAnswers(userId);
         return ResponseEntity.ok(notes);
     }
 
-    @Operation(
-            summary = "객체별 오답 노트 조회",
-            description = "특정 사용자의 특정 3D 객체에 대한 오답 노트를 조회합니다."
-    )
+    @Operation(summary = "3D 모델별 오답 노트 조회", description = "특정 3D 모델에 대한 오답만 조회")
     @GetMapping("/object/{objectName}")
     public ResponseEntity<List<WrongAnswerNote>> getWrongAnswersByObject(
             @RequestParam String userId,
@@ -58,40 +50,25 @@ public class WrongAnswerNoteController {
         return ResponseEntity.ok(notes);
     }
 
-    @Operation(
-            summary = "미복습 오답 노트 조회",
-            description = "특정 사용자의 아직 복습하지 않은 오답 노트를 조회합니다."
-    )
+    @Operation(summary = "미복습 오답 노트 조회", description = "복습하지 않은 오답만 조회")
     @GetMapping("/unreviewed")
-    public ResponseEntity<List<WrongAnswerNote>> getUnreviewedWrongAnswers(
-            @RequestParam String userId
-    ) {
+    public ResponseEntity<List<WrongAnswerNote>> getUnreviewedWrongAnswers(@RequestParam String userId) {
         log.info("Get unreviewed wrong answers | userId: {}", userId);
         List<WrongAnswerNote> notes = wrongAnswerNoteService.getUnreviewedWrongAnswers(userId);
         return ResponseEntity.ok(notes);
     }
 
-    @Operation(
-            summary = "오답 노트 복습 완료 처리",
-            description = "특정 오답 노트를 복습 완료 상태로 변경합니다."
-    )
+    @Operation(summary = "오답 복습 완료 처리", description = "오답을 복습 완료 상태로 변경")
     @PutMapping("/{noteId}/review")
-    public ResponseEntity<Void> markAsReviewed(
-            @PathVariable Long noteId
-    ) {
+    public ResponseEntity<Void> markAsReviewed(@PathVariable Long noteId) {
         log.info("Mark as reviewed | noteId: {}", noteId);
         wrongAnswerNoteService.markAsReviewed(noteId);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "오답 노트 삭제",
-            description = "특정 오답 노트를 삭제합니다."
-    )
+    @Operation(summary = "오답 노트 삭제", description = "오답 노트 삭제")
     @DeleteMapping("/{noteId}")
-    public ResponseEntity<Void> deleteWrongAnswer(
-            @PathVariable Long noteId
-    ) {
+    public ResponseEntity<Void> deleteWrongAnswer(@PathVariable Long noteId) {
         log.info("Delete wrong answer | noteId: {}", noteId);
         wrongAnswerNoteService.deleteWrongAnswer(noteId);
         return ResponseEntity.ok().build();

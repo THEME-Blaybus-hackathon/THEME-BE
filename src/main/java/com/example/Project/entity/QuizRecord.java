@@ -13,9 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 퀴즈 기록 Entity
- */
 @Entity
 @Table(name = "quiz_records")
 @Data
@@ -29,32 +26,32 @@ public class QuizRecord {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String quizId;  // 퀴즈 세션 ID
+    private String quizId;
 
     @Column(nullable = false)
-    private String objectName;  // 3D 모델 이름
+    private String objectName;
 
     @Column
-    private String selectedPart;  // 선택된 부품
+    private String selectedPart;
 
     @Column
-    private String userId;  // 사용자 ID (선택사항)
+    private String userId;
 
     @Column(nullable = false)
-    private Integer totalQuestions;  // 전체 문제 수
+    private Integer totalQuestions;
 
     @Column(nullable = false)
-    private Integer correctAnswers;  // 정답 수
+    private Integer correctAnswers;
 
     @Column(nullable = false)
-    private Double score;  // 점수 (문제당 10점, 총 30점)
-
-    @Column  // nullable 허용 (등급 산정 제거)
-    private String grade;  // 등급 (사용 안 함)
-
-    @Column(nullable = false)
-    private Instant createdAt;  // 생성 시각
+    private Double score;
 
     @Column
-    private Instant submittedAt;  // 제출 시각
+    private String grade;
+
+    @Column(nullable = false)
+    private Instant createdAt;
+
+    @Column
+    private Instant submittedAt;
 }

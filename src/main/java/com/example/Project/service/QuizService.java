@@ -34,21 +34,19 @@ public class QuizService {
     private final PromptService promptService;
     private final QuizRecordRepository quizRecordRepository;
     private final ChatContextService chatContextService;
-    private WrongAnswerNoteService wrongAnswerNoteService;  // Setter 주입으로 변경
+    private WrongAnswerNoteService wrongAnswerNoteService;
 
     private final Map<String, List<QuizQuestion>> quizSessions = new ConcurrentHashMap<>();
-    private final Map<String, String> quizObjectNames = new ConcurrentHashMap<>();  // quizId -> objectName
+    private final Map<String, String> quizObjectNames = new ConcurrentHashMap<>();
 
-    // 생성자
-    public QuizService(OpenAiService openAiService, PromptService promptService, 
-                      QuizRecordRepository quizRecordRepository, ChatContextService chatContextService) {
+    public QuizService(OpenAiService openAiService, PromptService promptService,
+            QuizRecordRepository quizRecordRepository, ChatContextService chatContextService) {
         this.openAiService = openAiService;
         this.promptService = promptService;
         this.quizRecordRepository = quizRecordRepository;
         this.chatContextService = chatContextService;
     }
 
-    // WrongAnswerNoteService Setter 주입 (순환 의존성 방지)
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     public void setWrongAnswerNoteService(WrongAnswerNoteService wrongAnswerNoteService) {
         this.wrongAnswerNoteService = wrongAnswerNoteService;
@@ -58,7 +56,7 @@ public class QuizService {
         log.info("Generating quiz from chat | session: {} | object: {}", sessionId, objectName);
 
         if (questionCount == null) {
-            questionCount = 3;  // 기본 3문제
+            questionCount = 3;
         }
 
         String quizId = UUID.randomUUID().toString();
@@ -74,7 +72,7 @@ public class QuizService {
 
         List<QuizQuestion> questions = parseQuizResponse(aiResponse, questionCount);
         quizSessions.put(quizId, questions);
-        quizObjectNames.put(quizId, objectName);  // objectName 저장 (오답 노트용)
+        quizObjectNames.put(quizId, objectName);
 
         QuizRecord record = QuizRecord.builder()
                 .quizId(quizId)
@@ -83,7 +81,7 @@ public class QuizService {
                 .totalQuestions(questions.size())
                 .correctAnswers(0)
                 .score(0.0)
-                .grade(null)  // 등급 제거
+                .grade(null)
                 .createdAt(Instant.now())
                 .build();
         quizRecordRepository.save(record);
@@ -110,7 +108,7 @@ public class QuizService {
                 .totalQuestions(questions.size())
                 .correctAnswers(0)
                 .score(0.0)
-                .grade(null)  // 등급 제거
+                .grade(null) // 등급 제거
                 .createdAt(Instant.now())
                 .build();
         quizRecordRepository.save(record);
@@ -157,16 +155,16 @@ public class QuizService {
         quizRecordRepository.save(record);
 
         // 오답 노트 저장 (userId가 있고 wrongAnswerNoteService가 주입된 경우에만)
-        if (wrongAnswerNoteService != null && 
-            request.getUserId() != null && 
-            !request.getUserId().trim().isEmpty()) {
+        if (wrongAnswerNoteService != null
+                && request.getUserId() != null
+                && !request.getUserId().trim().isEmpty()) {
             String objectName = quizObjectNames.get(request.getQuizId());
             if (objectName != null) {
                 wrongAnswerNoteService.saveWrongAnswers(
-                    request.getUserId(), 
-                    request.getQuizId(), 
-                    objectName, 
-                    results
+                        request.getUserId(),
+                        request.getQuizId(),
+                        objectName,
+                        results
                 );
             }
         }
