@@ -1,247 +1,139 @@
-## THE:ME Backend
+# THE:ME Backend
 
-3D 기반 공학 교육 플랫폼 백엔드 API
+3D 기반 공학 교육 플랫폼 THE:ME의 백엔드 API 서버입니다. 사용자는 3D 모델을 탐색하며 AI 어시스턴트와 실시간으로 대화하고, 대화 내용을 바탕으로 생성된 퀴즈를 풀며, 이 모든 학습 과정(요약+메모+퀴즈 결과)을 스마트 PDF 리포트로 저장할 수 있습니다.
 
 ## 주요 기능
 
-JWT 기반 사용자 인증
+🔐 JWT & OAuth 인증: 세션(Web) 및 JWT(API) 통합 인증 지원 (Google, Kakao, Naver).
 
-소셜 로그인 (Google, Kakao, Naver)
+🤖 AI 어시스턴트 (GPT-5-mini): 3D 엔지니어링 모델에 특화된 컨텍스트 인식 질의응답.
 
-AI 어시스턴트 (GPT-5-mini)
+🎯 AI 맞춤형 퀴즈 (New) ⭐: AI와 나눈 대화 내용을 분석하여 OX 퀴즈를 자동 생성하고, 채점 결과와 해설을 오답 노트로 저장.
 
-3D 모델 에셋 스트리밍 및 메타데이터 API 제공 (New)
+📄 AI 스마트 요약 리포트 (New) ⭐: 대화 요약 + 학습 메모 + 퀴즈 오답 노트를 통합하여 하나의 PDF 학습 리포트로 자동 생성.
 
-스마트 PDF 리포트 생성 (New) ⭐
+📦 3D 모델 에셋 스트리밍: 3D 모델 파일(.glb) 및 메타데이터 API 제공.
 
-대화 내역 및 사용자 메모를 PDF 문서로 자동 변환
+📝 학습 메모: 부품별 사용자 학습 메모 저장 및 리포트 반영.
 
-한글 폰트(HYGoThic) 지원
+🛡️ 강력한 보안: Spring Security 7.0.2 기반 Role 관리 및 암호화.
 
 ## 기술 스택
 
-### 1️⃣ 세션 기반 (웹 UI)
+### Backend Core
 
-이메일/비밀번호 로그인
+Java 17 / Spring Boot 3.4.2
 
-소셜 로그인 (Google, Kakao, Naver)
+Spring Security 7.0.2 (BCrypt, Role Management)
 
-브라우저 세션 쿠키 사용
+Spring Data JPA / H2 Database
 
-### 2️⃣ JWT 토큰 (REST API)
+### Auth & Security
 
-JWT Access/Refresh Token
+JWT (JJWT 0.12.3): Access/Refresh Token 발급
 
-API 클라이언트용 (모바일, SPA)
+OAuth 2.0 Client: Google, Kakao, Naver 연동
 
-OAuth → JWT 연동 지원 ⭐ NEW
+### AI & Data Processing
 
-### 🤖 AI 어시스턴트 기능 (NEW!)
+OpenAI API: GPT-5-mini / GPT-4o (Chat, Summarization, Quiz Generation)
 
-OpenAI GPT-4o 기반 컨텍스트 인식 AI
+iText PDF 5.5.13: PDF Generation
 
-4가지 3D 엔지니어링 모델 지원
-
-Jet Engine (제트 엔진)
-
-Suspension (차량 서스펜션)
-
-Robot Arm (로봇 팔)
-
-Vice (바이스)
-
-부품별 상세 설명 (3D 메시 선택 시)
-
-대화 컨텍스트 유지 (세션별, 객체별)
-
-학부 수준 기술 설명
-
-### 📄 PDF 리포트 기능 (NEW!)
-
-iText 5 + iText Asian 라이브러리 사용
-
-자동 기록: AI와의 대화 내용이 자동으로 포함됨
-
-메모 기능: 사용자가 작성한 학습 메모 포함
-
-### 🔐 보안 기능
-
-Spring Security 7.0.2
-
-BCrypt 비밀번호 암호화
-
-Role 기반 권한 관리 (USER, ADMIN, PREMIUM)
-
-JWT 토큰 인증/갱신
-
-### 📡 API 문서화
-
-Swagger UI: http://localhost:8080/swagger-ui.html
-
-API Docs: http://localhost:8080/api-docs
+iText Asian: 한글 폰트(HYGoThic) 렌더링 지원
 
 ## 기술 스택 구조
 
 Backend
-├── Spring Boot 3.4.2
-├── Spring Security 7.0.2
-├── Spring Data JPA
-├── JWT (JJWT 0.12.3)
-├── iText PDF 5.5.13 (PDF Generation)
-└── H2 Database
-
-AI & ML
-└── OpenAI GPT-5-mini API
-
-Documentation
-└── Swagger (SpringDoc OpenAPI 2.3.0)
-
-OAuth 2.0
-├── Google OAuth
-├── Kakao OAuth
-└── Naver OAuth
-## 📡 주요 엔드포인트
-
-### 🌐 웹 페이지
-
-GET  /                      → 홈 (로그인 페이지)
-GET  /login                 → 로그인 페이지
-POST /login                 → 폼 로그인 처리
-GET  /signup                → 회원가입 페이지
-POST /signup                → 회원가입 처리
-GET  /dashboard             → 대시보드 (인증 필요)
-GET  /auth/{provider}       → OAuth 로그인 시작
-GET  /oauth-signup          → OAuth 추가 정보 입력
-### 🔌 인증 API
-
-POST /api/auth/login        → JWT 로그인
-POST /api/auth/refresh      → JWT 토큰 갱신
-GET  /api/auth/{provider}   → OAuth 소셜 로그인 (JWT) ⭐
-### 🤖 AI 어시스턴트 API (NEW!)
-
-POST   /api/ai/ask          → AI에게 질문하기
-POST   /api/ai/report       → 대화 내역 PDF 다운로드 ⭐
-DELETE /api/ai/history      → 대화 히스토리 삭제
-DELETE /api/ai/session      → 세션 전체 삭제
-## 📱 OAuth 소셜 로그인 사용법
-
-### 웹 클라이언트 (세션 방식)
-
-JavaScript
-// 소셜 로그인 버튼 클릭
-window.location.href = '/auth/google';
-
-// 자동으로 세션 생성 후 대시보드로 이동
-### API 클라이언트 (JWT 방식) ⭐ NEW
-
-JavaScript
-// type=api 파라미터 추가
-window.location.href = '/api/auth/google?type=api';
-
-// JSON 응답으로 JWT 토큰 반환
-{
-  "success": true,
-  "data": {
-    "accessToken": "eyJhbGc...",
-    "refreshToken": "eyJhbGc...",
-    "tokenType": "Bearer"
-  }
-}
-Java 17
 
 Spring Boot 3.4.2
 
-Spring Security
+Spring Security 7.0.2
+
+Spring Data JPA
+
+JWT (JJWT 0.12.3)
+
+iText PDF 5.5.13 (PDF Generation)
 
 H2 Database
 
-OpenAI API
+AI & ML
 
-## 시작하기
+OpenAI GPT-5-mini API
+
+Documentation
+
+Swagger (SpringDoc OpenAPI 2.3.0)
+
+OAuth 2.0
+
+Google OAuth
+
+Kakao OAuth
+
+Naver OAuth
+
+## 📡 주요 엔드포인트 (API Endpoints)
+
+### 🌐 웹 페이지 (Web View) GET / : 홈 (로그인 페이지) GET /dashboard : 대시보드 (인증 필요) GET /auth/{provider} : OAuth 로그인 (Google, Kakao, Naver)
+
+### 🔌 인증 API (Auth API) POST /api/auth/login : JWT 로그인 POST /api/auth/refresh : 토큰 갱신 GET /api/auth/{provider}?type=api : OAuth 소셜 로그인 (JWT 반환)
+
+### 🤖 AI 어시스턴트 & Report (New!) POST /api/ai/ask : AI에게 질문하기 (부품/전체) POST /api/ai/summary : 대화 내용 AI 요약 (텍스트 반환) ⭐ NEW POST /api/ai/report : AI 요약 + 메모 + 퀴즈 결과 포함 PDF 다운로드 ⭐ DELETE /api/ai/session : 대화 세션 초기화
+
+### 🎯 AI Quiz API (New!) POST /api/quiz/generate-from-chat : 대화 기반 OX 퀴즈 생성 POST /api/quiz/submit : 퀴즈 답안 제출 & 채점 (PDF 연동 자동 저장)
+
+### 📦 3D Assets & Metadata GET /api/objects : 카테고리별 부품 메타데이터 조회 GET /asset/{category}/{filename} : 3D 모델(.glb) 및 이미지 파일 스트리밍
+
+## 📱 OAuth 소셜 로그인 사용법
+
+### 웹 클라이언트 (세션 방식) 소셜 로그인 버튼 클릭 시 이동: window.location.href = '/auth/google'; -> 로그인 후 대시보드 리다이렉트
+
+### API 클라이언트 (JWT 방식) type=api 파라미터 추가: window.location.href = '/api/auth/google?type=api';
+
+JSON 응답 예시: { "success": true, "data": { "accessToken": "eyJhbGc...", "refreshToken": "eyJhbGc...", "tokenType": "Bearer" } }
+
+## 시작하기 (Getting Started)
 
 ### 요구사항
 
 JDK 17 이상
 
-Gradle
+Gradle 7.x 이상
 
-### 설치
+### 설치 git clone https://github.com/YOUR_USERNAME/THE-ME-Backend.git cd THE-ME-Backend
 
-git clone https://github.com/YOUR_USERNAME/SIMVEX-Backend.git cd SIMVEX-Backend
+### 설정 (application.properties) OpenAI API Key (GPT-5-mini) openai.api.key=your-key-here
 
-### 설정
+JWT Secret jwt.secret=your-secret-key
 
-application.properties.example 복사 (필수) 보안을 위해 실제 키는 포함되어 있지 않습니다. 복사 후 값을 채워주세요.
+OAuth Keys (Optional) sns.google.client.id=your-id sns.google.client.secret=your-secret
 
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+### 실행 ./gradlew bootRun
 
-API 키 설정 (application.properties)
+서버 주소: http://localhost:8080 Swagger UI: http://localhost:8080/swagger-ui.html
 
-OpenAI (GPT-5-mini)
-openai.api.key=your-key-here
+## 지원 3D 모델 (API Keywords)
 
-JWT Secret Key
-jwt.secret=your-secret-key jwt.access-token-validity=3600000 jwt.refresh-token-validity=86400000
+드론 (drone): 프로펠러, 배터리 등 구조 학습
 
-Google OAuth (선택)
-sns.google.client.id=your-id sns.google.client.secret=your-secret
+로봇 팔 (robot_arm): 관절 및 작동 원리
 
-Kakao OAuth (선택)
-sns.kakao.client.id=your-key
+로봇 집게 (robot_gripper): 그리퍼 작동 메커니즘
 
-Naver OAuth (선택)
-sns.naver.client.id=your-id sns.naver.client.secret=your-secret
+V4 엔진 (v4_engine): 내연기관 엔진 구조
 
-### 실행
+서스펜션 (suspension): 충격 흡수 장치 원리
 
-./gradlew bootRun
+머신 바이스 (machine_vice): 공작 기계 고정 장치
 
-서버: http://localhost:8080
+판 스프링 (leaf_spring): 탄성체 역학
 
-## API 문서
-
-Swagger UI: http://localhost:8080/swagger-ui.html
-
-### 주요 엔드포인트 상세
-
-인증
-
-POST /api/auth/signup - 회원가입
-
-POST /api/auth/signin - 로그인
-
-GET /auth/{provider} - OAuth 로그인
-
-3D 모델 & 에셋 (New)
-
-GET /api/objects?category={keyword} - 모델 부품 리스트 및 메타데이터 조회
-
-GET /asset/{category}/{filename} - 3D 파일(.glb) 및 이미지 직접 접근 (로그인 불필요)
-
-AI 어시스턴트 (자동 저장)
-
-POST /api/ai/ask - 질문하기
-
-{ "objectName": "drone", "question": "프로펠러의 역할은?", "sessionId": "user-123", "selectedPart": "impeller_blade" }
-
-PDF 리포트 (New)
-
-POST /api/ai/report - PDF 리포트 다운로드
-
-{ "sessionId": "user-123", "objectName": "drone", "title": "드론 학습 리포트", "memo": "중요한 내용 메모" }
-
-## 지원 3D 모델 (API 키워드)
-
-API 요청 시 category 또는 objectName 파라미터에 아래 소문자 키워드를 사용하세요.
-
-| 모델명 | API 키워드 (category) | | 로봇 팔 | robot_arm | | 머신 바이스 | machine_vice | | 판 스프링 | leaf_spring | | 드론 | drone | | V4 엔진 | v4_engine | | 로봇 집게 | robot_gripper | | 서스펜션 | suspension | | 제트 엔진 | jet_engine |
+제트 엔진 (jet_engine): 항공 엔진 추진 원리
 
 ## 개발
 
-### 빌드
+### 빌드 ./gradlew build
 
-./gradlew build
-
-### 테스트
-
-./gradlew test
+### 테스트 ./gradlew test

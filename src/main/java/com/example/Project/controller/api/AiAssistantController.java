@@ -2,8 +2,6 @@ package com.example.Project.controller.api;
 
 import java.util.List;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +15,7 @@ import com.example.Project.dto.AiAskRequest;
 import com.example.Project.dto.AiAskResponse;
 import com.example.Project.dto.ApiResponse;
 import com.example.Project.dto.ChatMessage;
-import com.example.Project.dto.PdfExportRequest;
 import com.example.Project.service.AiAssistantService;
-import com.example.Project.service.PdfExportService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AiAssistantController {
 
     private final AiAssistantService aiAssistantService;
-    private final PdfExportService pdfExportService;
 
     @Operation(summary = "AI에게 질문 (HTML 응답)", description = "3D 모델에 대해 AI에게 질문하고 HTML 형식 답변 받기")
     @PostMapping("/ask")
@@ -89,22 +84,5 @@ public class AiAssistantController {
 
         aiAssistantService.clearSession(sessionId);
         return ResponseEntity.ok(ApiResponse.success("Session cleared", "All chat history cleared for this session"));
-    }
-
-    @Operation(summary = "Export Chat & Memo to PDF", description = "Generate a PDF report containing user memo and chat history.")
-    @PostMapping("/report")
-    public ResponseEntity<byte[]> generateReport(@RequestBody PdfExportRequest request) {
-        log.info("PDF Generation Request | title: {}", request.getTitle());
-
-        byte[] pdfBytes = pdfExportService.generatePdf(request);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-
-        headers.setContentDispositionFormData("attachment", "report.pdf");
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(pdfBytes);
     }
 }
