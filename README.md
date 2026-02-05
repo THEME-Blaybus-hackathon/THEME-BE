@@ -1,6 +1,6 @@
 # THE:ME Backend
 
-3D 기반 공학 교육 플랫폼 THE:ME의 백엔드 API 서버입니다. 사용자는 3D 모델을 탐색하며 AI 어시스턴트와 실시간으로 대화하고, AI가 대화 내용을 자동으로 요약해주는 스마트 PDF 리포트를 생성하여 다운로드할 수 있습니다.
+3D 기반 공학 교육 플랫폼 THE:ME의 백엔드 API 서버입니다. 사용자는 3D 모델을 탐색하며 AI 어시스턴트와 실시간으로 대화하고, 대화 내용을 바탕으로 생성된 퀴즈를 풀며, 이 모든 학습 과정(요약+메모+퀴즈 결과)을 스마트 PDF 리포트로 저장할 수 있습니다.
 
 ## 주요 기능
 
@@ -8,7 +8,9 @@
 
 🤖 AI 어시스턴트 (GPT-5-mini): 3D 엔지니어링 모델에 특화된 컨텍스트 인식 질의응답.
 
-📄 AI 스마트 요약 리포트 (New) ⭐: 단순 대화 로그 저장이 아닌, AI가 대화의 핵심 내용을 자동으로 요약(Bullet Point)하여 PDF 리포트로 생성.
+🎯 AI 맞춤형 퀴즈 (New) ⭐: AI와 나눈 대화 내용을 분석하여 OX 퀴즈를 자동 생성하고, 채점 결과와 해설을 오답 노트로 저장.
+
+📄 AI 스마트 요약 리포트 (New) ⭐: 대화 요약 + 학습 메모 + 퀴즈 오답 노트를 통합하여 하나의 PDF 학습 리포트로 자동 생성.
 
 📦 3D 모델 에셋 스트리밍: 3D 모델 파일(.glb) 및 메타데이터 API 제공.
 
@@ -34,7 +36,7 @@ OAuth 2.0 Client: Google, Kakao, Naver 연동
 
 ### AI & Data Processing
 
-OpenAI API: GPT-5-mini / GPT-4o (Chat & Summarization)
+OpenAI API: GPT-5-mini / GPT-4o (Chat, Summarization, Quiz Generation)
 
 iText PDF 5.5.13: PDF Generation
 
@@ -78,7 +80,9 @@ Naver OAuth
 
 ### 🔌 인증 API (Auth API) POST /api/auth/login : JWT 로그인 POST /api/auth/refresh : 토큰 갱신 GET /api/auth/{provider}?type=api : OAuth 소셜 로그인 (JWT 반환)
 
-### 🤖 AI 어시스턴트 & Report (New!) POST /api/ai/ask : AI에게 질문하기 (부품/전체) POST /api/ai/summary : 대화 내용 AI 요약 (텍스트 반환) ⭐ NEW POST /api/ai/report : AI 요약 + 메모 포함 PDF 다운로드 ⭐ DELETE /api/ai/session : 대화 세션 초기화
+### 🤖 AI 어시스턴트 & Report (New!) POST /api/ai/ask : AI에게 질문하기 (부품/전체) POST /api/ai/summary : 대화 내용 AI 요약 (텍스트 반환) ⭐ NEW POST /api/ai/report : AI 요약 + 메모 + 퀴즈 결과 포함 PDF 다운로드 ⭐ DELETE /api/ai/session : 대화 세션 초기화
+
+### 🎯 AI Quiz API (New!) POST /api/quiz/generate-from-chat : 대화 기반 OX 퀴즈 생성 POST /api/quiz/submit : 퀴즈 답안 제출 & 채점 (PDF 연동 자동 저장)
 
 ### 📦 3D Assets & Metadata GET /api/objects : 카테고리별 부품 메타데이터 조회 GET /asset/{category}/{filename} : 3D 모델(.glb) 및 이미지 파일 스트리밍
 
