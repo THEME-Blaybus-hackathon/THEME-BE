@@ -63,6 +63,10 @@ public class AiAssistantService {
         return AiAskResponse.of(answer);
     }
 
+    public List<ChatMessage> getChatHistory(String sessionId, String objectName) {
+        return chatContextService.getHistory(sessionId, objectName);
+    }
+
     public void clearHistory(String sessionId, String objectId) {
         chatContextService.clearHistory(sessionId, objectId);
     }
