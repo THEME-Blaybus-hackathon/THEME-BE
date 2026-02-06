@@ -39,17 +39,6 @@ public class WrongAnswerNoteController {
         return ResponseEntity.ok(notes);
     }
 
-    @Operation(summary = "3D 모델별 오답 노트 조회", description = "특정 3D 모델에 대한 오답만 조회")
-    @GetMapping("/object/{objectName}")
-    public ResponseEntity<List<WrongAnswerNote>> getWrongAnswersByObject(
-            @RequestParam String userId,
-            @PathVariable String objectName
-    ) {
-        log.info("Get wrong answers by object | userId: {}, object: {}", userId, objectName);
-        List<WrongAnswerNote> notes = wrongAnswerNoteService.getWrongAnswersByObject(userId, objectName);
-        return ResponseEntity.ok(notes);
-    }
-
     @Operation(summary = "미복습 오답 노트 조회", description = "복습하지 않은 오답만 조회")
     @GetMapping("/unreviewed")
     public ResponseEntity<List<WrongAnswerNote>> getUnreviewedWrongAnswers(@RequestParam String userId) {
