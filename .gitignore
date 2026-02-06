@@ -1,15 +1,16 @@
-# Application properties with real keys
-application.properties
+### ============================================
+### THE:ME Backend - .gitignore
+### ============================================
+
+### Sensitive Configuration ###
+# Application properties with secrets (OpenAI API Key, JWT Secret, OAuth)
 src/main/resources/application.properties
 src/test/resources/application.properties
 **/application.properties
 **/application-*.properties
 !**/application.properties.example
 
-# Frontend test directory (temporary UI prototypes)
-frontend-test/
-
-# Environment files
+# Environment variables
 .env
 .env.*
 *.env
@@ -26,28 +27,7 @@ secret.*
 *.crt
 *.keystore
 
-# OpenAI API keys
-*openai*.key
-*api-key*
-
-# OAuth credentials
-*oauth*.json
-*credentials*.json
-client-secret.json
-oauth-credentials.json
-
-# DOCUMENTATION FILES
-*.md
-!README.md
-!HELP.md
-*.MD
-!README.MD
-!HELP.MD
-
-# Markdown
-*.md
-!README.md
-
+### Build & Dependencies ###
 # Gradle
 .gradle/
 build/
@@ -65,7 +45,10 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
-# JAR/WAR files
+# Compiled files
+*.class
+
+# Archives
 *.jar
 *.war
 *.ear
@@ -75,9 +58,7 @@ release.properties
 *.rar
 !gradle/wrapper/*.jar
 
-# Class files
-*.class
-
+### IDE Settings ###
 # IntelliJ IDEA
 .idea/
 *.iws
@@ -113,10 +94,11 @@ bin/
 *.code-workspace
 .history/
 
-# JetBrains IDEs
+# JetBrains
 *.launch
 .metadata
 
+### Operating Systems ###
 # macOS
 .DS_Store
 .DS_Store?
@@ -145,18 +127,12 @@ $RECYCLE.BIN/
 .Trash-*
 .nfs*
 
+### Logs & Temporary Files ###
 # Log files
 *.log
 *.log.*
 logs/
 log/
-server*.log
-app*.log
-spring*.log
-error*.log
-debug*.log
-access*.log
-application*.log
 
 # Temporary files
 *.tmp
@@ -169,25 +145,16 @@ application*.log
 *.orig
 *.rej
 
-# Test output
+# Process files
 *.pid
 *.seed
 *.pid.lock
 
-# Virtual machine crash logs
+# JVM crash logs
 hs_err_pid*
 replay_pid*
 
-# Shell scripts
-*.sh
-!gradlew
-!gradle/wrapper/*.sh
-
-# Batch files
-*.bat
-!gradlew.bat
-!gradle/wrapper/*.bat
-
+### Test & Generated Files ###
 # Test results
 test-results/
 test-output/
@@ -195,47 +162,31 @@ test-output/
 .nyc_output/
 .jacoco/
 *.exec
-ai-test.html
-**/ai-test.html
-test*.html
-demo*.html
 
-# User data files (quiz results, PDFs, etc.)
+# Generated sources
+generated/
+.generated/
+
+# Cache directories
+.cache/
+cache/
+
+### User-Generated Content ###
+# PDF reports (학습 리포트)
 *.pdf
 !**/docs/*.pdf
-!**/documentation/*.pdf
+
+# Quiz data
 quiz*.json
 *_quiz*.json
 *quiz_*.json
-quiz_gen.json
-quiz_response.json
-*_study_report.pdf
-study_report*.pdf
-test_report*.pdf
 
-# HTML files (frontend/templates - backend developer)
-*.html
-!**/static/index.html
-!**/public/index.html
+# Test scripts (개발 중 임시 테스트용)
+*.sh
+!gradlew
 
-# Node modules
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-
-# H2 Database files
+### Database Files ###
+# H2 Database
 *.db
 *.mv.db
 *.trace.db
@@ -250,37 +201,26 @@ testdb.*
 *.mdb
 *.accdb
 
-# Local configuration overrides
-application-local.properties
-application-dev.properties
-application-prod.properties
-application-secret.properties
-*-local.*
-*-override.*
-*-secret.*
+### Documentation (Keep Only Essential) ###
+# Markdown - 필수 문서만 유지
+*.md
+!README.md
+!API_SPECIFICATION.md
+!OAUTH_GUIDE.md
 
-# Large media files (uncomment if needed)
-# *.mp4
-# *.avi
-# *.mov
-# *.wmv
-# *.flv
+### Other ###
+# Node modules (if any)
+node_modules/
 
-# Images (uncomment if not needed in repo)
-# *.jpg
-# *.jpeg
-# *.png
-# *.gif
-# *.bmp
-# *.ico
+# Python (if any)
+__pycache__/
+*.py[cod]
+venv/
+ENV/
 
-# Generated sources
-generated/
-.generated/
-
-# Cache directories
-.cache/
-cache/
-
-# Spring Boot DevTools
-.springBeans
+# HTML test files (keep templates)
+ai-test.html
+test*.html
+demo*.html
+!**/templates/**/*.html
+!**/static/index.html
