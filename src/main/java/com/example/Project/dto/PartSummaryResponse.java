@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class PdfExportRequest {
-    private String title;
-    private String sessionId; 
-    private String objectName; 
-
+@NoArgsConstructor
+public class PartSummaryResponse {
+    private Long id;
+    private String name;
 }

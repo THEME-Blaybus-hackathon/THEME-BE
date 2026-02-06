@@ -74,7 +74,6 @@ public class OpenAiService {
             );
 
             Map<String, Object> responseBody = response.getBody();
-            log.debug("OpenAI Response Body: {}", responseBody);
 
             if (responseBody == null) {
                 throw new RuntimeException("Empty response from OpenAI");
@@ -82,21 +81,11 @@ public class OpenAiService {
 
             List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
             if (choices == null || choices.isEmpty()) {
-                log.error("No choices in response. Full response: {}", responseBody);
                 throw new RuntimeException("No choices in OpenAI response");
             }
 
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
-            if (message == null) {
-                log.error("No message in choice. Full response: {}", responseBody);
-                throw new RuntimeException("No message in OpenAI response");
-            }
-
             String content = (String) message.get("content");
-            if (content == null || content.trim().isEmpty()) {
-                log.error("Empty content in message. Full response: {}", responseBody);
-                throw new RuntimeException("Empty content in OpenAI response");
-            }
 
             log.info("Received response from OpenAI ({} tokens)",
                     ((Map<String, Object>) responseBody.get("usage")).get("total_tokens"));
@@ -132,5 +121,11 @@ public class OpenAiService {
         messages.add(ChatMessage.user(fullQuery));
 
         return messages;
+    }
+
+    public String callGpt(String prompt) {
+        List<ChatMessage> messages = new ArrayList<>();
+        messages.add(ChatMessage.user(prompt)); 
+        return sendChatCompletion(messages, false);
     }
 }
