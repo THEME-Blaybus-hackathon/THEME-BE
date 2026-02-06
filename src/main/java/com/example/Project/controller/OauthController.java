@@ -22,11 +22,15 @@ import com.example.Project.security.JwtTokenProvider;
 import com.example.Project.service.AuthService;
 import com.example.Project.service.OauthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "OAuth Social Login", description = "소셜 로그인 API (Google, Kakao, Naver)")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -34,79 +38,133 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OauthController {
 
+    private static final String OAUTH_TYPE_SESSION_KEY = "oauth_type";
+    private static final String PENDING_USER_SESSION_KEY = "pendingOAuthUser";
+    private static final String OAUTH_TYPE_API = "api";
+    
     private final OauthService oauthService;
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Operation(
+        summary = "OAuth 로그인 시작", 
+        description = "소셜 로그인 제공자의 인증 페이지로 리다이렉트합니다. (Google, Kakao, Naver)"
+    )
     @GetMapping(value = "/{socialLoginType}")
-    public void socialLoginType(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
+    public void socialLoginType(
+            @Parameter(description = "소셜 로그인 타입", example = "google")
+            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
+            @Parameter(description = "요청 타입 (web: 세션, api: JWT)", example = "web")
             @RequestParam(name = "type", required = false, defaultValue = "web") String type,
             HttpServletResponse response,
             HttpSession session) throws IOException {
-        log.info("SNS login request received :: {} (type: {})", socialLoginType, type);
+        
+        log.info("🔐 OAuth login initiated: {} (type: {})", socialLoginType, type);
 
-        if ("api".equalsIgnoreCase(type)) {
-            session.setAttribute("oauth_type", "api");
+        // API 요청 타입 세션에 저장
+        if (OAUTH_TYPE_API.equalsIgnoreCase(type)) {
+            session.setAttribute(OAUTH_TYPE_SESSION_KEY, OAUTH_TYPE_API);
         }
 
         String redirectUrl = oauthService.getRedirectUrl(socialLoginType);
-        log.info("Redirect URL :: {}", redirectUrl);
+        log.info("↗️  Redirecting to: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 
+    @Operation(
+        summary = "OAuth 콜백", 
+        description = "소셜 로그인 제공자로부터 인증 코드를 받아 처리합니다."
+    )
     @GetMapping(value = "/{socialLoginType}/callback")
-    public void callback(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
+    public void callback(
+            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
             @RequestParam(name = "code") String code,
             HttpServletResponse response,
             HttpSession session) throws IOException {
-        log.info("Received authorization code from {} :: {}", socialLoginType, code);
+        
+        log.info("🔑 OAuth callback received from {}", socialLoginType);
 
+        // 1. Authorization Code → Access Token
         String accessToken = oauthService.requestAccessToken(socialLoginType, code);
-        log.info("Access Token :: {}", accessToken);
-
         if (accessToken == null) {
+            log.error("❌ Failed to get access token");
             handleOAuthError(response, session, "액세스 토큰 획득 실패");
             return;
         }
+        log.debug("✅ Access token obtained");
 
+        // 2. Access Token → User Info
         OAuthUserInfo userInfo = oauthService.getUserInfo(socialLoginType, accessToken);
-        log.info("OAuth User Info :: {}", userInfo);
-
         if (userInfo == null) {
+            log.error("❌ Failed to get user info");
             handleOAuthError(response, session, "사용자 정보 획득 실패");
             return;
         }
+        log.info("✅ User info obtained: {}", userInfo.getEmail());
 
+        // 3. 기존 사용자 확인
         User user = authService.findOAuthUser(userInfo);
+        boolean isApiRequest = isApiRequest(session);
 
-        String oauthType = (String) session.getAttribute("oauth_type");
-        boolean isApiRequest = "api".equalsIgnoreCase(oauthType);
-
+        // 4-1. 신규 사용자
         if (user == null) {
-            log.info("New user detected");
-
-            if (isApiRequest) {
-                log.info("API request - auto signup");
-                user = authService.signupOAuthUser(userInfo, userInfo.getEmail());
-                redirectToApiSuccess(response, user, true);
-            } else {
-                log.info("Web request - redirect to additional info page");
-                session.setAttribute("pendingOAuthUser", userInfo);
-                response.sendRedirect("/oauth-signup");
-            }
+            handleNewUser(userInfo, isApiRequest, response, session);
             return;
         }
 
-        log.info("Existing user login :: {}", user.getEmail());
+        // 4-2. 기존 사용자
+        handleExistingUser(user, isApiRequest, response, session);
+    }
+
+    /**
+     * 신규 사용자 처리
+     */
+    private void handleNewUser(OAuthUserInfo userInfo, boolean isApiRequest, 
+                                HttpServletResponse response, HttpSession session) throws IOException {
+        log.info("👤 New user detected: {}", userInfo.getEmail());
 
         if (isApiRequest) {
-            redirectToApiSuccess(response, user, false);
+            // API 요청: 자동 회원가입 + JWT 반환
+            log.info("🔧 Auto signup for API request");
+            User newUser = authService.signupOAuthUser(userInfo, userInfo.getEmail());
+            respondWithJwt(response, session, newUser, true);
         } else {
+            // Web 요청: 추가 정보 입력 페이지로 이동
+            log.info("📝 Redirect to additional info page");
+            session.setAttribute(PENDING_USER_SESSION_KEY, userInfo);
+            response.sendRedirect("/oauth-signup");
+        }
+    }
+
+    /**
+     * 기존 사용자 처리
+     */
+    private void handleExistingUser(User user, boolean isApiRequest, 
+                                     HttpServletResponse response, HttpSession session) throws IOException {
+        log.info("✅ Existing user login: {}", user.getEmail());
+
+        if (isApiRequest) {
+            // API 요청: JWT 반환
+            respondWithJwt(response, session, user, false);
+        } else {
+            // Web 요청: 세션 생성 + 대시보드 이동
             createSessionAndRedirect(user, session, response);
         }
     }
 
-    private void createSessionAndRedirect(User user, HttpSession session, HttpServletResponse response) throws IOException {
+    /**
+     * API 요청 여부 확인
+     */
+    private boolean isApiRequest(HttpSession session) {
+        String oauthType = (String) session.getAttribute(OAUTH_TYPE_SESSION_KEY);
+        return OAUTH_TYPE_API.equalsIgnoreCase(oauthType);
+    }
+
+    /**
+     * 세션 생성 및 리다이렉트 (Web 로그인)
+     */
+    private void createSessionAndRedirect(User user, HttpSession session, 
+                                           HttpServletResponse response) throws IOException {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),
                 null,
@@ -116,32 +174,47 @@ public class OauthController {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        session.removeAttribute("oauth_type");
+        session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
 
+        log.info("✅ Session created, redirecting to dashboard");
         response.sendRedirect("/dashboard");
     }
 
-    private void redirectToApiSuccess(HttpServletResponse response, User user, boolean isNewUser) throws IOException {
+    /**
+     * JWT 토큰 응답 (API 로그인)
+     */
+    private void respondWithJwt(HttpServletResponse response, HttpSession session, 
+                                 User user, boolean isNewUser) throws IOException {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
+
+        response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(String.format(
-                "{\"success\":true,\"message\":\"로그인 성공\",\"data\":{\"accessToken\":\"%s\",\"refreshToken\":\"%s\",\"tokenType\":\"Bearer\",\"isNewUser\":%b}}",
+                "{\"success\":true,\"message\":\"로그인 성공\",\"data\":{" +
+                "\"accessToken\":\"%s\"," +
+                "\"refreshToken\":\"%s\"," +
+                "\"tokenType\":\"Bearer\"," +
+                "\"isNewUser\":%b}}",
                 accessToken, refreshToken, isNewUser
         ));
+
+        log.info("✅ JWT tokens issued (isNewUser: {})", isNewUser);
     }
 
-    private void handleOAuthError(HttpServletResponse response, HttpSession session, String errorMessage) throws IOException {
-        log.error("OAuth error: {}", errorMessage);
+    /**
+     * OAuth 에러 처리
+     */
+    private void handleOAuthError(HttpServletResponse response, HttpSession session, 
+                                   String errorMessage) throws IOException {
+        log.error("❌ OAuth error: {}", errorMessage);
 
-        String oauthType = (String) session.getAttribute("oauth_type");
-        boolean isApiRequest = "api".equalsIgnoreCase(oauthType);
+        boolean isApiRequest = isApiRequest(session);
+        session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
 
         if (isApiRequest) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json; charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(String.format(
                     "{\"success\":false,\"message\":\"%s\",\"data\":null}",
@@ -150,7 +223,5 @@ public class OauthController {
         } else {
             response.sendRedirect("/login?error=oauth");
         }
-
-        session.removeAttribute("oauth_type");
     }
 }

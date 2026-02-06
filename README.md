@@ -202,11 +202,12 @@ src/main/java/com/example/Project/
 │   │   ├── AuthApiController.java
 │   │   ├── QuizController.java
 │   │   ├── WrongAnswerNoteController.java
-│   │   └── UserController.java
-│   ├── OauthController.java      # OAuth 로그인
+│   │   ├── UserController.java
+│   │   └── TestDataController.java      # 테스트 데이터 생성 (dev 환경 only)
+│   ├── OauthController.java      # OAuth 소셜 로그인
 │   ├── AiSummaryController.java  # AI 요약
 │   ├── MemoController.java       # 학습 메모
-│   └── LearningObjectController.java
+│   └── LearningObjectController.java    # 3D 모델 메타데이터 (JSON 기반)
 ├── service/
 │   ├── AiAssistantService.java
 │   ├── QuizService.java
@@ -217,9 +218,12 @@ src/main/java/com/example/Project/
 └── dto/                          # DTO 클래스
 
 src/main/resources/
+├── application.properties        # 애플리케이션 설정
 ├── prompts.json                  # AI 모델별 프롬프트
-├── object-metadata.json          # 3D 모델 메타데이터
-└── assets/                       # 3D 모델 파일
+├── object-metadata.json          # 3D 모델 메타데이터 (NEW!)
+└── static/
+    └── models/
+        └── asset/                # 3D 모델 파일 (.glb)
 ```
 
 ---
@@ -236,10 +240,38 @@ src/main/resources/
 ./gradlew test
 ```
 
+### 개발 환경 실행 (테스트 API 활성화)
+```bash
+# application.properties에 추가
+spring.profiles.active=dev
+
+# 실행
+./gradlew bootRun
+```
+
 ### 로그 확인
 ```bash
 tail -f logs/application.log
 ```
+
+---
+
+## 🔧 주요 개선 사항 (v1.1)
+
+### 아키텍처 정리
+- ✅ **프론트엔드 완전 분리**: Thymeleaf 제거, REST API 전용 서버로 전환
+- ✅ **불필요한 의존성 제거**: MySQL Connector, Thymeleaf 제거 (16→13개)
+- ✅ **테스트 컨트롤러 보안**: `@Profile("dev")` 적용, 운영 환경에서 자동 비활성화
+
+### 코드 품질 향상
+- ✅ **LearningObjectController 리팩토링**: 하드코딩 제거 → JSON 기반 메타데이터 관리
+- ✅ **OauthController 구조 개선**: 메서드 분리, 가독성 향상, 로깅 개선
+- ✅ **AI 맥락 인식 강화**: 대화 히스토리 활용 프롬프트 규칙 추가
+
+### 파일 정리
+- ✅ **30+ 문서 파일 삭제**: 테스트/개발용 Markdown 파일 제거
+- ✅ **프론트엔드 파일 삭제**: HTML 테스트 페이지 제거
+- ✅ **.gitignore 재구조화**: 섹션별 분류, 필수 문서만 추적
 
 ---
 
