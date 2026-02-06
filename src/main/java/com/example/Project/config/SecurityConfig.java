@@ -38,57 +38,47 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // API 요청은 STATELESS, 폼 로그인은 세션 사용
                 .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorize -> authorize
-                // 공개 경로
-                .requestMatchers(
-                        "/",
-                        "/login",
-                        "/signup",
-                        "/oauth-signup",
-                        "/ai-test.html",
-                        "/api/auth/login",
-                        "/api/auth/signup",
-                        "/api/auth/refresh",
-                        "/api/auth/google",
-                        "/api/auth/kakao",
-                        "/api/auth/naver",
-                        "/api/ai/**",
-                        "/api/ai-assistant/**",
-                        "/api/quiz/**",
-                        "/api/wrong-answers/**", // 오답 노트 API 허용
-                        "/api/test-data/**", // 테스트 데이터 API 허용
-                        "/h2-console/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/api-docs/**",
-                        "/error",
-                        "/api/objects",
-                        "/asset/**",
-                        "/models/**",
-                        "/api/memos/**",
-                        "/api/export-pdf/**"
-                ).permitAll()
-                // 관리자만 접근 가능한 경로
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // 그 외 모든 요청은 인증 필요
-                .anyRequest().authenticated())
-                // JWT 필터 추가
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/signup",
+                                "/oauth-signup",
+                                "/ai-test.html",
+                                "/api/auth/**",
+                                "/api/ai/**",
+                                "/api/ai-assistant/**",
+                                "/api/quiz/**",
+                                "/api/wrong-answers/**",
+                                "/api/test-data/**",
+                                "/h2-console/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/error",
+                                "/api/objects/**",
+                                "/asset/**",
+                                "/models/**",
+                                "/api/memos/**",
+                                "/api/export-pdf/**"
+                        ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/dashboard", true)
-                .failureUrl("/login?error=true")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .permitAll())
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login?error=true")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .permitAll())
                 .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
-                .permitAll())
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll())
                 .userDetailsService(userDetailsService);
 
         return http.build();
@@ -122,7 +112,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:8080",
-                "http://localhost:5173" // Vite 기본 포트
+                "http://localhost:5173"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
