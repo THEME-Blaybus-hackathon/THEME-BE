@@ -63,7 +63,8 @@ public class SecurityConfig {
                                 "/asset/**",         // [본인 수정] 이미지/3D 파일 허용
                                 "/models/**",
                                 "/api/memos/**",
-                                "/api/export-pdf/**"
+                                "/api/pdf/**",
+                                "/api/quiz/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
