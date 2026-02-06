@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 "/signup",
                                 "/oauth-signup",
                                 "/ai-test.html",
-                                "/api/auth/**",
+                                "/test/**",          // [팀원 추가] 테스트 페이지
+                                "/api/auth/**",      // [본인 수정] 모든 인증 API 허용
                                 "/api/ai/**",
                                 "/api/ai-assistant/**",
                                 "/api/quiz/**",
@@ -58,8 +59,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api-docs/**",
                                 "/error",
-                                "/api/objects/**",
-                                "/asset/**",
+                                "/api/objects/**",   // [본인 수정] 중요! /**가 있어야 상세조회 됨
+                                "/asset/**",         // [본인 수정] 이미지/3D 파일 허용
                                 "/models/**",
                                 "/api/memos/**",
                                 "/api/export-pdf/**"
