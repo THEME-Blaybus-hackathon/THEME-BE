@@ -49,6 +49,7 @@ public class SecurityConfig {
                         "/signup",
                         "/oauth-signup",
                         "/ai-test.html",
+                        "/test/**", // 테스트 페이지 허용 추가
                         "/api/auth/login",
                         "/api/auth/signup",
                         "/api/auth/refresh",
