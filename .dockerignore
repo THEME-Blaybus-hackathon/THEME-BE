@@ -8,8 +8,7 @@ README.md
 
 # Build artifacts
 build/
-.gradle/
-gradle/
+#.gradle/
 
 # IDE
 .idea/
