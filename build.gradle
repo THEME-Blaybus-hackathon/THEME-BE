@@ -1,67 +1,42 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.2'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '4.0.2'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-description = 'Login project for Spring Boot'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'  // Health check
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
-	
-	// JWT 의존성
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-	
-	// Swagger 문서화
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-	
-	// dotenv 환경변수 관리
-	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
-	
-	// Configuration Properties
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	
-	// Database drivers
-	runtimeOnly 'com.h2database:h2'  // 개발 환경
-	runtimeOnly 'org.postgresql:postgresql'  // 운영 환경 (Render)
-	
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	// pdf
-	implementation 'com.itextpdf:itextpdf:5.5.13.3'
-    implementation 'com.itextpdf:itext-asian:5.2.0'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.security:spring-security-web'
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    implementation 'com.h2database:h2' 
+    
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    
+    // Swagger (Spring Boot 4.x 호환 버전)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // PDF
+    implementation 'com.itextpdf:itextpdf:5.5.13.3'
 }

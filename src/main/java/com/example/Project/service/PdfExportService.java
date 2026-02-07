@@ -3,18 +3,15 @@ package com.example.Project.service;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.Project.dto.PdfExportRequest;
+import com.example.Project.dto.MemoResponse;
 import com.example.Project.entity.QuizAnswer;
 import com.example.Project.repository.QuizAnswerRepository;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -36,23 +33,31 @@ public class PdfExportService {
 
         log.info("PDF 생성 시작 - 세션: {}, 모델: {}", sessionId, objectName);
 
-        // 1. [데이터 조회] (에러 방지를 위한 Null 처리)
+        // 1. [메모 데이터 조회] - 리스트를 하나의 문자열로 합침
         String savedMemo = "메모 내용 없음";
         try {
-            String memo = memoService.getMemo(objectName);
-            if (memo != null) savedMemo = memo;
+            List<MemoResponse> memos = memoService.getMemosByPart(objectName);
+            if (memos != null && !memos.isEmpty()) {
+                savedMemo = memos.stream()
+                        .map(MemoResponse::getContent)
+                        .collect(Collectors.joining("\n- "));
+                savedMemo = "- " + savedMemo;
+            }
         } catch (Exception e) {
-            log.warn("메모 조회 실패 (PDF 생성은 계속 진행): {}", e.getMessage());
+            log.warn("메모 조회 실패: {}", e.getMessage());
         }
 
+        // 2. [AI 요약 데이터 조회]
         String summaryText = "AI 요약 생성 실패";
         try {
+            // 이 메서드가 AiAssistantService에 있는지 확인 필요
             String summary = aiAssistantService.createSummary(sessionId, objectName);
             if (summary != null) summaryText = summary;
         } catch (Exception e) {
-            log.warn("AI 요약 실패 (PDF 생성은 계속 진행): {}", e.getMessage());
+            log.warn("AI 요약 실패: {}", e.getMessage());
         }
         
+        // 3. [퀴즈 데이터 조회]
         List<QuizAnswer> quizList = Collections.emptyList();
         try {
             quizList = quizAnswerRepository.findBySessionIdAndObjectNameOrderByCreatedAtDesc(sessionId, objectName);
@@ -60,7 +65,7 @@ public class PdfExportService {
             log.warn("퀴즈 조회 실패: {}", e.getMessage());
         }
 
-        // 2. [PDF 생성]
+        // 4. [PDF 생성 도구 준비]
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -68,71 +73,57 @@ public class PdfExportService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // --- 폰트 설정 (핵심: 에러 방지) ---
+            // --- 한글 폰트 설정 (맥/윈도우 공용 안전빵 설정) ---
             BaseFont baseFont;
             try {
-                // 1순위: 한글 폰트 시도 (itext-asian 의존성이 있거나, 시스템에 폰트가 있을 경우)
+                // 아시아 폰트팩이 있다면 사용
                 baseFont = BaseFont.createFont("HYGoThic-Medium", "UniKS-UCS2-H", BaseFont.NOT_EMBEDDED);
             } catch (Exception e) {
-                log.error("한글 폰트 로딩 실패! 기본 영문 폰트로 대체합니다. (한글이 깨질 수 있음)", e);
-                // 2순위: 무조건 되는 영문 폰트 (500 에러 방지용)
+                log.warn("기본 한글 폰트 로딩 실패, 시스템 폰트 시도");
+                // 폰트가 깨진다면 아래 경로에 실제 .ttf 파일을 넣는게 좋지만, 일단 헬베티카로 죽지 않게 방어
                 baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
             }
             
             Font titleFont = new Font(baseFont, 20, Font.BOLD);
-            Font sectionFont = new Font(baseFont, 16, Font.BOLD, BaseColor.DARK_GRAY);
-            Font bodyFont = new Font(baseFont, 11, Font.NORMAL);
-            Font correctColor = new Font(baseFont, 11, Font.BOLD, BaseColor.BLUE);
-            Font wrongColor = new Font(baseFont, 11, Font.BOLD, BaseColor.RED);
+            Font sectionFont = new Font(baseFont, 14, Font.BOLD, BaseColor.DARK_GRAY);
+            Font bodyFont = new Font(baseFont, 10, Font.NORMAL);
+            Font correctFont = new Font(baseFont, 10, Font.BOLD, BaseColor.BLUE);
+            Font wrongFont = new Font(baseFont, 10, Font.BOLD, BaseColor.RED);
 
-            // [1] 제목
-            document.add(new Paragraph(request.getTitle() != null ? request.getTitle() : "학습 리포트", titleFont));
-            document.add(new Paragraph("Target Object: " + objectName, bodyFont));
+            // [PDF 내용 채우기]
+            document.add(new Paragraph(request.getTitle() != null ? request.getTitle() : "Learning Report", titleFont));
+            document.add(new Paragraph("Target: " + objectName, bodyFont));
             document.add(new Paragraph("--------------------------------------------------", bodyFont));
 
-            // [2] 학습 메모
-            document.add(new Paragraph("\n1. My Memo", sectionFont));
+            document.add(new Paragraph("\n1. My Memos", sectionFont));
             document.add(new Paragraph(savedMemo, bodyFont));
 
-            // [3] AI 요약
             document.add(new Paragraph("\n2. AI Summary", sectionFont));
             document.add(new Paragraph(summaryText, bodyFont));
 
-            // [4] 퀴즈 오답 노트
-            document.add(new Paragraph("\n3. Quiz Results (" + (quizList != null ? quizList.size() : 0) + ")", sectionFont));
-            
+            document.add(new Paragraph("\n3. Quiz Review", sectionFont));
             if (quizList != null && !quizList.isEmpty()) {
-                int qNum = 1;
-                for (QuizAnswer q : quizList) {
-                    // Q. 문제
-                    document.add(new Paragraph("\nQ" + qNum++ + ". " + q.getQuestion(), new Font(baseFont, 11, Font.BOLD)));
+                for (int i = 0; i < quizList.size(); i++) {
+                    QuizAnswer q = quizList.get(i);
+                    document.add(new Paragraph("\nQ" + (i+1) + ". " + q.getQuestion(), bodyFont));
                     
-                    // 결과
-                    Paragraph resultP = new Paragraph();
-                    resultP.setFont(bodyFont);
-                    resultP.add("User: " + q.getUserAnswer() + "  /  Answer: " + q.getCorrectAnswer() + "   ");
-                    
+                    Paragraph result = new Paragraph("Your Answer: " + q.getUserAnswer() + " / Correct: " + q.getCorrectAnswer(), bodyFont);
                     if (q.isCorrect()) {
-                        resultP.add(new Chunk("[Correct]", correctColor));
+                        result.add(new Chunk(" [CORRECT]", correctFont));
                     } else {
-                        resultP.add(new Chunk("[Wrong]", wrongColor));
+                        result.add(new Chunk(" [WRONG]", wrongFont));
                     }
-                    document.add(resultP);
-                    
-                    // 해설
-                    document.add(new Paragraph("Tip: " + q.getExplanation(), new Font(baseFont, 10, Font.ITALIC, BaseColor.DARK_GRAY)));
-                    document.add(new Paragraph("-------------------------------------", new Font(baseFont, 8, Font.NORMAL, BaseColor.LIGHT_GRAY)));
+                    document.add(result);
+                    document.add(new Paragraph("Explanation: " + q.getExplanation(), new Font(baseFont, 9, Font.ITALIC)));
                 }
             } else {
-                document.add(new Paragraph("(No quiz history found)", bodyFont));
+                document.add(new Paragraph("No quiz data available.", bodyFont));
             }
 
             document.close();
-            log.info("PDF 생성 성공!");
-
         } catch (Exception e) {
-            log.error("PDF 생성 중 치명적 오류 발생", e);
-            throw new RuntimeException("PDF 생성 실패: " + e.getMessage());
+            log.error("PDF 생성 중 치명적 오류", e);
+            throw new RuntimeException("PDF 생성 실패했습니다.");
         }
 
         return out.toByteArray();
