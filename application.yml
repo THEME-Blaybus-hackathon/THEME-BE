@@ -1,0 +1,91 @@
+spring:
+  application:
+    name: Project
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.h2.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  # H2 Console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Logging
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.example.Project: DEBUG
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity: 3600000
+  refresh-token-validity: 604800000
+
+# Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+# OpenAI Configuration
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    model: ${OPENAI_MODEL}
+    url: https://api.openai.com/v1/chat/completions
+
+# OAuth Configuration
+sns:
+  google:
+    url: https://accounts.google.com/o/oauth2/v2/auth
+    client:
+      id: ${GOOGLE_CLIENT_ID}
+      secret: ${GOOGLE_CLIENT_SECRET}
+    callback:
+      url: http://localhost:8080/auth/google/callback
+    token:
+      url: https://oauth2.googleapis.com/token
+    userinfo:
+      url: https://www.googleapis.com/oauth2/v2/userinfo
+
+  kakao:
+    url: https://kauth.kakao.com/oauth/authorize
+    client:
+      id: ${KAKAO_CLIENT_ID}
+    callback:
+      url: http://localhost:8080/auth/kakao/callback
+    token:
+      url: https://kauth.kakao.com/oauth/token
+    userinfo:
+      url: https://kapi.kakao.com/v2/user/me
+
+  naver:
+    url: https://nid.naver.com/oauth2.0/authorize
+    client:
+      id: ${NAVER_CLIENT_ID}
+      secret: ${NAVER_CLIENT_SECRET}
+    callback:
+      url: http://localhost:8080/auth/naver/callback
+    token:
+      url: https://nid.naver.com/oauth2.0/token
+    userinfo:
+      url: https://openapi.naver.com/v1/nid/me
