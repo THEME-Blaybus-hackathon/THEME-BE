@@ -41,14 +41,14 @@ public class OauthController {
     private static final String OAUTH_TYPE_SESSION_KEY = "oauth_type";
     private static final String PENDING_USER_SESSION_KEY = "pendingOAuthUser";
     private static final String OAUTH_TYPE_API = "api";
-    
+
     private final OauthService oauthService;
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(
-        summary = "OAuth 로그인 시작", 
-        description = "소셜 로그인 제공자의 인증 페이지로 리다이렉트합니다. (Google, Kakao, Naver)"
+            summary = "OAuth 로그인 시작",
+            description = "소셜 로그인 제공자의 인증 페이지로 리다이렉트합니다. (Google, Kakao, Naver)"
     )
     @GetMapping(value = "/{socialLoginType}")
     public void socialLoginType(
@@ -58,7 +58,7 @@ public class OauthController {
             @RequestParam(name = "type", required = false, defaultValue = "web") String type,
             HttpServletResponse response,
             HttpSession session) throws IOException {
-        
+
         log.info("🔐 OAuth login initiated: {} (type: {})", socialLoginType, type);
 
         // API 요청 타입 세션에 저장
@@ -72,8 +72,8 @@ public class OauthController {
     }
 
     @Operation(
-        summary = "OAuth 콜백", 
-        description = "소셜 로그인 제공자로부터 인증 코드를 받아 처리합니다."
+            summary = "OAuth 콜백",
+            description = "소셜 로그인 제공자로부터 인증 코드를 받아 처리합니다."
     )
     @GetMapping(value = "/{socialLoginType}/callback")
     public void callback(
@@ -81,7 +81,7 @@ public class OauthController {
             @RequestParam(name = "code") String code,
             HttpServletResponse response,
             HttpSession session) throws IOException {
-        
+
         log.info("🔑 OAuth callback received from {}", socialLoginType);
 
         // 1. Authorization Code → Access Token
@@ -119,8 +119,8 @@ public class OauthController {
     /**
      * 신규 사용자 처리
      */
-    private void handleNewUser(OAuthUserInfo userInfo, boolean isApiRequest, 
-                                HttpServletResponse response, HttpSession session) throws IOException {
+    private void handleNewUser(OAuthUserInfo userInfo, boolean isApiRequest,
+            HttpServletResponse response, HttpSession session) throws IOException {
         log.info("👤 New user detected: {}", userInfo.getEmail());
 
         if (isApiRequest) {
@@ -139,8 +139,8 @@ public class OauthController {
     /**
      * 기존 사용자 처리
      */
-    private void handleExistingUser(User user, boolean isApiRequest, 
-                                     HttpServletResponse response, HttpSession session) throws IOException {
+    private void handleExistingUser(User user, boolean isApiRequest,
+            HttpServletResponse response, HttpSession session) throws IOException {
         log.info("✅ Existing user login: {}", user.getEmail());
 
         if (isApiRequest) {
@@ -163,8 +163,8 @@ public class OauthController {
     /**
      * 세션 생성 및 리다이렉트 (Web 로그인)
      */
-    private void createSessionAndRedirect(User user, HttpSession session, 
-                                           HttpServletResponse response) throws IOException {
+    private void createSessionAndRedirect(User user, HttpSession session,
+            HttpServletResponse response) throws IOException {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),
                 null,
@@ -183,8 +183,8 @@ public class OauthController {
     /**
      * JWT 토큰 응답 (API 로그인)
      */
-    private void respondWithJwt(HttpServletResponse response, HttpSession session, 
-                                 User user, boolean isNewUser) throws IOException {
+    private void respondWithJwt(HttpServletResponse response, HttpSession session,
+            User user, boolean isNewUser) throws IOException {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
@@ -192,11 +192,11 @@ public class OauthController {
 
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(String.format(
-                "{\"success\":true,\"message\":\"로그인 성공\",\"data\":{" +
-                "\"accessToken\":\"%s\"," +
-                "\"refreshToken\":\"%s\"," +
-                "\"tokenType\":\"Bearer\"," +
-                "\"isNewUser\":%b}}",
+                "{\"success\":true,\"message\":\"로그인 성공\",\"data\":{"
+                + "\"accessToken\":\"%s\","
+                + "\"refreshToken\":\"%s\","
+                + "\"tokenType\":\"Bearer\","
+                + "\"isNewUser\":%b}}",
                 accessToken, refreshToken, isNewUser
         ));
 
@@ -206,8 +206,8 @@ public class OauthController {
     /**
      * OAuth 에러 처리
      */
-    private void handleOAuthError(HttpServletResponse response, HttpSession session, 
-                                   String errorMessage) throws IOException {
+    private void handleOAuthError(HttpServletResponse response, HttpSession session,
+            String errorMessage) throws IOException {
         log.error("❌ OAuth error: {}", errorMessage);
 
         boolean isApiRequest = isApiRequest(session);
