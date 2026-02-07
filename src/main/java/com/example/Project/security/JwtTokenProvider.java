@@ -28,16 +28,26 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secretKey,
             @Value("${jwt.access-token-validity}") long accessTokenValidity,
             @Value("${jwt.refresh-token-validity}") long refreshTokenValidity) {
-        
+
         // Validate JWT secret
         if (secretKey == null || secretKey.trim().isEmpty()) {
+            log.error("❌ JWT secret is not configured!");
             throw new IllegalArgumentException(
-                "JWT secret is not configured! Please set JWT_SECRET environment variable."
+                    "JWT secret is not configured! Please set JWT_SECRET environment variable."
             );
         }
+
+        try {
+            // Try to decode as Base64
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            this.key = Keys.hmacShaKeyFor(keyBytes);
+            log.info("✅ JWT secret loaded successfully");
+        } catch (Exception e) {
+            log.error("❌ Failed to decode JWT secret as Base64. Using plain secret as fallback.");
+            // Fallback: Use plain secret key (not recommended for production)
+            this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        }
         
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityInMilliseconds = accessTokenValidity;
         this.refreshTokenValidityInMilliseconds = refreshTokenValidity;
     }

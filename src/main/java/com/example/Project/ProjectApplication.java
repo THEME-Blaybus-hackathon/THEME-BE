@@ -17,8 +17,8 @@ public class ProjectApplication {
                     .load();
 
             // Set environment variables from .env (local development only)
-            dotenv.entries().forEach(entry ->
-                    System.setProperty(entry.getKey(), entry.getValue())
+            dotenv.entries().forEach(entry
+                    -> System.setProperty(entry.getKey(), entry.getValue())
             );
         } catch (Exception e) {
             // Docker/Render: .env file not available, use system env vars
