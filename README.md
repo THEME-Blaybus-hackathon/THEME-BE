@@ -284,3 +284,62 @@ tail -f logs/application.log
 ## 📞 문의
 
 프로젝트 관련 문의는 GitHub Issues를 통해 남겨주세요.
+
+---
+
+## 📚 API 테스트 및 문서
+
+### 🚀 빠른 시작
+- **[Quick Start Guide](./QUICK_START_GUIDE.md)** - 5분 안에 API 테스트하기
+
+### 📖 상세 문서
+- **[Swagger 테스트 가이드](./SWAGGER_TEST_GUIDE.md)** - Swagger UI를 이용한 전체 API 테스트
+- **[API 사양서](./API_SPECIFICATION.md)** - 전체 API 명세 및 요청/응답 예시
+- **[API 테스트 결과](./API_TEST_REPORT.md)** - 28개 API 테스트 결과 보고서
+- **[OAuth 테스트 결과](./OAUTH_TEST_RESULTS.md)** - 소셜 로그인 테스트 결과
+- **[인증 설정](./AUTHENTICATION_REQUIRED.md)** - JWT 인증 정책 및 보안 설정
+- **[수정 필요 사항](./ISSUES_TO_FIX.md)** - 알려진 이슈 및 개선 사항
+
+### 🎯 테스트 시작하기
+
+#### 1. Swagger UI에서 테스트
+```bash
+# 서버 실행
+./gradlew bootRun
+
+# 브라우저에서 Swagger UI 접속
+open http://localhost:8080/swagger-ui/index.html
+```
+
+#### 2. cURL로 빠른 테스트
+```bash
+# 회원가입
+curl -X POST http://localhost:8080/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "test12345",
+    "name": "Test User"
+  }'
+
+# 로그인
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "test12345"
+  }'
+```
+
+#### 3. 자동화된 테스트 스크립트
+```bash
+# 전체 API 테스트
+./test-all-apis.sh
+
+# OAuth API 테스트
+./test-oauth-apis.sh
+```
+
+---
+
+## 🚀 시작하기

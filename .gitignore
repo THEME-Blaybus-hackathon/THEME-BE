@@ -197,6 +197,7 @@ quiz*.json
 *.trace.db
 testdb.*
 *.h2.db
+data/  # H2 파일 기반 DB 저장 폴더
 
 # SQLite
 *.sqlite

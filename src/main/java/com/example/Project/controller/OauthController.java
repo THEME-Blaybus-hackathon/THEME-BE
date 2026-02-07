@@ -1,13 +1,7 @@
 package com.example.Project.controller;
 
 import java.io.IOException;
-import java.util.Collections;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OauthController {
 
     private static final String OAUTH_TYPE_SESSION_KEY = "oauth_type";
-    private static final String PENDING_USER_SESSION_KEY = "pendingOAuthUser";
     private static final String OAUTH_TYPE_API = "api";
 
     private final OauthService oauthService;
@@ -123,17 +116,10 @@ public class OauthController {
             HttpServletResponse response, HttpSession session) throws IOException {
         log.info("👤 New user detected: {}", userInfo.getEmail());
 
-        if (isApiRequest) {
-            // API 요청: 자동 회원가입 + JWT 반환
-            log.info("🔧 Auto signup for API request");
-            User newUser = authService.signupOAuthUser(userInfo, userInfo.getEmail());
-            respondWithJwt(response, session, newUser, true);
-        } else {
-            // Web 요청: 추가 정보 입력 페이지로 이동
-            log.info("📝 Redirect to additional info page");
-            session.setAttribute(PENDING_USER_SESSION_KEY, userInfo);
-            response.sendRedirect("/oauth-signup");
-        }
+        // 자동 회원가입 + JWT 반환 (프론트엔드로 리다이렉트)
+        log.info("🔧 Auto signup and redirect to frontend");
+        User newUser = authService.signupOAuthUser(userInfo, userInfo.getEmail());
+        respondWithJwt(response, session, newUser, true);
     }
 
     /**
@@ -143,13 +129,8 @@ public class OauthController {
             HttpServletResponse response, HttpSession session) throws IOException {
         log.info("✅ Existing user login: {}", user.getEmail());
 
-        if (isApiRequest) {
-            // API 요청: JWT 반환
-            respondWithJwt(response, session, user, false);
-        } else {
-            // Web 요청: 세션 생성 + 대시보드 이동
-            createSessionAndRedirect(user, session, response);
-        }
+        // 모든 OAuth 로그인은 프론트엔드로 리다이렉트 (JWT 방식 통일)
+        respondWithJwt(response, session, user, false);
     }
 
     /**
@@ -161,27 +142,7 @@ public class OauthController {
     }
 
     /**
-     * 세션 생성 및 리다이렉트 (Web 로그인)
-     */
-    private void createSessionAndRedirect(User user, HttpSession session,
-            HttpServletResponse response) throws IOException {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                user.getEmail(),
-                null,
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-        );
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
-
-        log.info("✅ Session created, redirecting to dashboard");
-        response.sendRedirect("/dashboard");
-    }
-
-    /**
-     * JWT 토큰 응답 (API 로그인)
+     * JWT 토큰 응답 (프론트엔드로 리다이렉트)
      */
     private void respondWithJwt(HttpServletResponse response, HttpSession session,
             User user, boolean isNewUser) throws IOException {
@@ -190,17 +151,16 @@ public class OauthController {
 
         session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
 
-        response.setContentType("application/json; charset=UTF-8");
-        response.getWriter().write(String.format(
-                "{\"success\":true,\"message\":\"로그인 성공\",\"data\":{"
-                + "\"accessToken\":\"%s\","
-                + "\"refreshToken\":\"%s\","
-                + "\"tokenType\":\"Bearer\","
-                + "\"isNewUser\":%b}}",
-                accessToken, refreshToken, isNewUser
-        ));
+        // 프론트엔드로 리다이렉트 (Query String으로 토큰 전달)
+        String frontendUrl = "http://localhost:5173/auth/callback"
+            + "?accessToken=" + accessToken
+            + "&refreshToken=" + refreshToken
+            + "&tokenType=Bearer"
+            + "&isNewUser=" + isNewUser;
 
-        log.info("✅ JWT tokens issued (isNewUser: {})", isNewUser);
+        response.sendRedirect(frontendUrl);
+
+        log.info("✅ JWT tokens issued, redirecting to frontend (isNewUser: {})", isNewUser);
     }
 
     /**
