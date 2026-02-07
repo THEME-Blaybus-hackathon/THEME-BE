@@ -43,7 +43,11 @@ dependencies {
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 	
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
+	
+	// Database drivers
+	runtimeOnly 'com.h2database:h2'  // 개발 환경
+	runtimeOnly 'org.postgresql:postgresql'  // 운영 환경 (Render)
+	
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

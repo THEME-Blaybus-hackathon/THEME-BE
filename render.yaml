@@ -1,0 +1,60 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: project-backend
+    env: java
+    region: oregon  # 또는 singapore (아시아에 가까움)
+    plan: free
+    buildCommand: ./gradlew clean build -x test
+    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar build/libs/Project-0.0.1-SNAPSHOT.jar
+    envVars:
+      # Java Version
+      - key: JAVA_VERSION
+        value: "17"
+      
+      # Database (Render가 자동으로 DATABASE_URL 제공)
+      - key: DB_URL
+        fromDatabase:
+          name: project-db
+          property: connectionString
+      
+      # JWT Configuration
+      - key: JWT_SECRET
+        generateValue: true
+        sync: false
+      
+      # OpenAI Configuration
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      
+      # OAuth - Google
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      
+      # OAuth - Kakao
+      - key: KAKAO_CLIENT_ID
+        sync: false
+      
+      # OAuth - Naver
+      - key: NAVER_CLIENT_ID
+        sync: false
+      - key: NAVER_CLIENT_SECRET
+        sync: false
+    
+    # Health Check
+    healthCheckPath: /actuator/health
+    
+    # Auto Deploy
+    autoDeploy: true
+
+# PostgreSQL Database
+databases:
+  - name: project-db
+    databaseName: projectdb
+    user: projectuser
+    plan: free
+    region: oregon
