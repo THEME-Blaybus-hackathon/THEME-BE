@@ -1,0 +1,24 @@
+# Dockerfile에서 무시할 파일들
+.git
+.gitignore
+.env
+.env.*
+*.md
+README.md
+
+# Build artifacts
+build/
+.gradle/
+gradle/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,12 +1,12 @@
 services:
-  # Backend Web Service
+  # Backend Web Service (Docker)
   - type: web
     name: project-backend
-    env: java
+    env: docker
     region: oregon  # 또는 singapore (아시아에 가까움)
     plan: free
-    buildCommand: ./gradlew clean build -x test
-    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar build/libs/Project-0.0.1-SNAPSHOT.jar
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       # Java Version
       - key: JAVA_VERSION
