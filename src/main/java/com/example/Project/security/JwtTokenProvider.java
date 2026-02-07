@@ -28,6 +28,14 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secretKey,
             @Value("${jwt.access-token-validity}") long accessTokenValidity,
             @Value("${jwt.refresh-token-validity}") long refreshTokenValidity) {
+        
+        // Validate JWT secret
+        if (secretKey == null || secretKey.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "JWT secret is not configured! Please set JWT_SECRET environment variable."
+            );
+        }
+        
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityInMilliseconds = accessTokenValidity;
