@@ -1,31 +1,43 @@
 package com.example.Project.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "memo")
+@Builder
 public class Memo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String partName;
+    private String title;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @CreationTimestamp
+    @Column(name = "part_name", nullable = false)
+    private String partName;
+
     private LocalDateTime createdAt;
 
-    public void updateContent(String content) {
-    this.content = content;
-}
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

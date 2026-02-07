@@ -1,15 +1,15 @@
 package com.example.Project.dto;
-
-import lombok.*;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter @Builder
 public class MemoResponse {
     private Long id;
-    private String partName;
+    private String title;
     private String content;
+    private String partName;
     private LocalDateTime createdAt;
 }

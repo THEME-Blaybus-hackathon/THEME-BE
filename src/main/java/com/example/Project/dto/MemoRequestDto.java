@@ -3,7 +3,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class MemoUpdateRequest {
+public class MemoRequestDto {
     private String title;
     private String content;
+    private String partName;
 }
