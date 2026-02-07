@@ -2,6 +2,7 @@ package com.example.Project.controller.api;
 
 import java.time.Instant;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Tag(name = "Test Data API", description = "테스트 데이터 생성")
+@Profile("dev")  // 개발 환경에서만 활성화
+@Tag(name = "Test Data API (DEV ONLY)", description = "개발/테스트용 데이터 생성 API")
 @RestController
 @RequestMapping("/api/test-data")
 @RequiredArgsConstructor
@@ -24,10 +26,10 @@ public class TestDataController {
 
     private final WrongAnswerNoteRepository wrongAnswerNoteRepository;
 
-    @Operation(summary = "테스트용 오답 노트 생성", description = "샘플 오답 노트 3개 생성")
+    @Operation(summary = "테스트용 오답 노트 생성 (DEV ONLY)", description = "샘플 오답 노트 3개 생성 - 개발 환경에서만 동작")
     @PostMapping("/wrong-answers/mock")
     public ResponseEntity<String> createMockWrongAnswers() {
-        log.info("Creating mock wrong answer notes...");
+        log.warn("⚠️ Creating mock wrong answer notes - DEV ENVIRONMENT ONLY");
 
         // 목 데이터 1
         WrongAnswerNote note1 = WrongAnswerNote.builder()
