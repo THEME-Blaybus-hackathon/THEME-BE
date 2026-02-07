@@ -7,11 +7,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.example.Project.dto.PdfExportRequest;
 import com.example.Project.dto.MemoResponse;
+import com.example.Project.dto.PdfExportRequest;
 import com.example.Project.entity.QuizAnswer;
 import com.example.Project.repository.QuizAnswerRepository;
-import com.itextpdf.text.*;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -74,15 +79,17 @@ public class PdfExportService {
             document.open();
 
             // --- 한글 폰트 설정 (맥/윈도우 공용 안전빵 설정) ---
-            BaseFont baseFont;
-            try {
-                // 아시아 폰트팩이 있다면 사용
-                baseFont = BaseFont.createFont("HYGoThic-Medium", "UniKS-UCS2-H", BaseFont.NOT_EMBEDDED);
-            } catch (Exception e) {
-                log.warn("기본 한글 폰트 로딩 실패, 시스템 폰트 시도");
-                // 폰트가 깨진다면 아래 경로에 실제 .ttf 파일을 넣는게 좋지만, 일단 헬베티카로 죽지 않게 방어
-                baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-            }
+        BaseFont baseFont;
+        try {
+            // 맥북 기본 폰트 경로 (AppleGothic 또는 NanumGothic)
+            // .ttc 파일의 경우 경로 뒤에 ",0" 또는 ",1"을 붙여 인덱스를 지정해야 합니다.
+            String fontPath = "/System/Library/Fonts/Supplemental/AppleGothic.ttf"; 
+            baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        } catch (Exception e) {
+            log.warn("시스템 폰트 로드 실패, 폰트 파일이 해당 경로에 없는지 확인하세요: {}", e.getMessage());
+            // 최후의 수단: 하지만 한글은 여전히 깨질 수 있음
+            baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+}
             
             Font titleFont = new Font(baseFont, 20, Font.BOLD);
             Font sectionFont = new Font(baseFont, 14, Font.BOLD, BaseColor.DARK_GRAY);

@@ -25,6 +25,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-web'
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
     implementation 'com.h2database:h2' 
+    implementation 'org.postgresql:postgresql'
     
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'

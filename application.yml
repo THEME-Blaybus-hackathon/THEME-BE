@@ -3,31 +3,31 @@ spring:
     name: Project
 
   datasource:
-    url: ${DB_URL:jdbc:h2:mem:testdb}
-    driver-class-name: org.h2.Driver
-    username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:}
-  
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+      url: ${DB_URL}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
+      # create: 매번 테이블 새로 생성 / update: 변경 사항만 반영
+      ddl-auto: update 
     show-sql: true
-    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+        # PostgreSQL 엔진 최적화
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: ${JWT_SECRET:your_default_jwt_secret_key_at_least_32_chars_long}
+  secret: ${JWT_SECRET}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:3600000}
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
 
 openai:
   api:
-    key: ${OPENAI_API_KEY:no-key}
-    model: ${OPENAI_MODEL:gpt-4o}
+    key: ${OPENAI_API_KEY}
+    model: ${OPENAI_MODEL}
     url: https://api.openai.com/v1/chat/completions
 
 sns:

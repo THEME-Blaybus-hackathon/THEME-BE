@@ -31,7 +31,7 @@ public class Memo {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "part_name", nullable = false)
+    @Column(name = "partName", nullable = false)
     private String partName;
 
     private LocalDateTime createdAt;

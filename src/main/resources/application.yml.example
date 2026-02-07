@@ -1,44 +1,18 @@
-# Example Application Configuration
-# Copy this file to application.yml and use it with .env file
-
 spring:
   application:
     name: Project
 
-  # Database Configuration
-  datasource:
-    url: ${DB_URL}
-    driver-class-name: org.h2.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  # H2 Console
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-  # JPA Configuration
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-# Logging
+# Logging (공통)
 logging:
   level:
-    org.springframework.security: DEBUG
-    com.example.Project: DEBUG
+    org.springframework.security: INFO
+    com.example.Project: INFO
 
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET}
-  access-token-validity: 3600000
-  refresh-token-validity: 604800000
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:3600000}
+  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
 
 # Swagger Configuration
 springdoc:
@@ -56,15 +30,13 @@ openai:
     model: ${OPENAI_MODEL}
     url: https://api.openai.com/v1/chat/completions
 
-# OAuth Configuration
+# OAuth Configuration (공통 URL, 환경별 콜백은 프로파일에서 오버라이드)
 sns:
   google:
     url: https://accounts.google.com/o/oauth2/v2/auth
     client:
       id: ${GOOGLE_CLIENT_ID}
       secret: ${GOOGLE_CLIENT_SECRET}
-    callback:
-      url: http://localhost:8080/auth/google/callback
     token:
       url: https://oauth2.googleapis.com/token
     userinfo:
@@ -74,8 +46,6 @@ sns:
     url: https://kauth.kakao.com/oauth/authorize
     client:
       id: ${KAKAO_CLIENT_ID}
-    callback:
-      url: http://localhost:8080/auth/kakao/callback
     token:
       url: https://kauth.kakao.com/oauth/token
     userinfo:
@@ -86,8 +56,6 @@ sns:
     client:
       id: ${NAVER_CLIENT_ID}
       secret: ${NAVER_CLIENT_SECRET}
-    callback:
-      url: http://localhost:8080/auth/naver/callback
     token:
       url: https://nid.naver.com/oauth2.0/token
     userinfo:

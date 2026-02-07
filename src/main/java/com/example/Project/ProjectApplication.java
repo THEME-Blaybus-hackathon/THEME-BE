@@ -9,23 +9,26 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class ProjectApplication {
 
     public static void main(String[] args) {
-        // Load .env file only in local development
-        // Docker/Render uses system environment variables
-        try {
-            Dotenv dotenv = Dotenv.configure()
-                    .ignoreIfMissing() // .env 파일이 없어도 에러 발생 안함
-                    .load();
-
-            // Set environment variables from .env (local development only)
-            dotenv.entries().forEach(entry
-                    -> System.setProperty(entry.getKey(), entry.getValue())
-            );
-        } catch (Exception e) {
-            // Docker/Render: .env file not available, use system env vars
-            System.out.println("Running without .env file (using system environment variables)");
-        }
+        loadEnv();
 
         SpringApplication.run(ProjectApplication.class, args);
     }
 
+    private static void loadEnv() {
+        try {
+            Dotenv dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+
+            dotenv.entries().forEach(entry -> {
+                if (System.getProperty(entry.getKey()) == null) {
+                    System.setProperty(entry.getKey(), entry.getValue());
+                }
+            });
+            
+            System.out.println("✅ Environment variables loaded from .env file");
+        } catch (Exception e) {
+            System.out.println("ℹ️ Running with system environment variables (No .env file found)");
+        }
+    }
 }
