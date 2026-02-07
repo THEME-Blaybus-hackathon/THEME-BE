@@ -1,0 +1,51 @@
+# ============================================
+# Local Development Configuration Template
+# ============================================
+# 사용법:
+# 1. 이 파일을 application-local.yml 로 복사
+# 2. .env 파일에 실제 값 설정
+# 3. 로컬에서 --spring.profiles.active=local 로 실행
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.example.Project: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity: 3600000
+  refresh-token-validity: 604800000
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    model: gpt-4o-mini
+
+sns:
+  google:
+    callback:
+      url: http://localhost:8080/auth/google/callback
+  kakao:
+    callback:
+      url: http://localhost:8080/auth/kakao/callback
+  naver:
+    callback:
+      url: http://localhost:8080/auth/naver/callback
