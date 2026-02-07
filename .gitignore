@@ -9,6 +9,9 @@ src/test/resources/application.properties
 **/application.properties
 **/application-*.properties
 !**/application.properties.example
+**/application.yml
+**/application-*.yml
+!**/application.yml.example
 
 # Environment variables
 .env
