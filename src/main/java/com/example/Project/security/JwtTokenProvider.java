@@ -3,8 +3,9 @@ package com.example.Project.security;
 import java.security.Key;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.example.Project.config.JwtProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,52 +22,47 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenProvider {
 
     private final Key key;
-    private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
+    private final JwtProperties properties;
 
-    public JwtTokenProvider(
-            @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.access-token-validity}") long accessTokenValidity,
-            @Value("${jwt.refresh-token-validity}") long refreshTokenValidity) {
+    public JwtTokenProvider(JwtProperties properties) {
+        this.properties = properties;
+
+        String secretKey = properties.getSecret();
 
         // Validate JWT secret
-        if (secretKey == null || secretKey.trim().isEmpty()) {
+        if (secretKey == null || secretKey.isBlank()) {
             log.error("❌ JWT secret is not configured!");
-            throw new IllegalArgumentException(
-                    "JWT secret is not configured! Please set JWT_SECRET environment variable."
+            throw new IllegalStateException(
+                    "JWT_SECRET is missing. Please configure it in environment variables."
             );
         }
 
         // Initialize key with proper error handling
-        Key tempKey;
+        byte[] keyBytes;
         try {
             // Try to decode as Base64
-            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-            tempKey = Keys.hmacShaKeyFor(keyBytes);
+            keyBytes = Decoders.BASE64.decode(secretKey);
             log.info("✅ JWT secret loaded successfully (Base64)");
         } catch (Exception e) {
-            log.warn("⚠️ Failed to decode JWT secret as Base64. Using plain secret as fallback.");
-            // Fallback: Use plain secret key (ensure it's at least 256 bits / 32 bytes)
-            byte[] keyBytes = secretKey.getBytes();
+            log.warn("⚠️ JWT secret is not Base64. Using raw key.");
+            keyBytes = secretKey.getBytes();
+
+            // Ensure key is at least 256 bits (32 bytes) for HS256
             if (keyBytes.length < 32) {
-                // Pad the key if it's too short
                 byte[] paddedKey = new byte[32];
                 System.arraycopy(keyBytes, 0, paddedKey, 0, Math.min(keyBytes.length, 32));
-                tempKey = Keys.hmacShaKeyFor(paddedKey);
-            } else {
-                tempKey = Keys.hmacShaKeyFor(keyBytes);
+                keyBytes = paddedKey;
+                log.info("✅ Key padded to 32 bytes");
             }
         }
 
-        this.key = tempKey;
-        this.accessTokenValidityInMilliseconds = accessTokenValidity;
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidity;
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // Access Token 생성
     public String createAccessToken(String email, String role) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
+        Date validity = new Date(now.getTime() + properties.getAccessTokenValidity());
 
         return Jwts.builder()
                 .setSubject(email)
@@ -81,7 +77,7 @@ public class JwtTokenProvider {
     // Refresh Token 생성
     public String createRefreshToken(String email) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+        Date validity = new Date(now.getTime() + properties.getRefreshTokenValidity());
 
         return Jwts.builder()
                 .setSubject(email)
