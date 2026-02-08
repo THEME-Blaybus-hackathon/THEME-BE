@@ -13,9 +13,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // 추가
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.example.Project.security.JwtAuthenticationFilter; // 필터 임포트 확인
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +26,9 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    // 1. 필터 주입 추가 (Lombok @RequiredArgsConstructor가 생성자 주입을 해줍니다)
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -46,18 +52,14 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/login", "/h2-console/**", 
                     "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**",
-                    "/auth/**",
-                    "/api/auth/**",
-                    "/api/user/**",
-                    "/api/objects/**",
-                    "/api/ai/**",
-                    "/api/memos/**",
-                    "/api/pdf/**",
-                    "/api/quiz/**",
+                    "/auth/**", "/api/auth/**", "/api/user/**", "/api/objects/**",
+                    "/api/ai/**", "/api/memos/**", "/api/pdf/**", "/api/quiz/**",
                     "/api/wrong-answers/**"
                 ).permitAll()
                 .anyRequest().authenticated()
-            );
+            )
+            // 2. JWT 필터 등록 (UsernamePasswordAuthenticationFilter 보다 먼저 실행되도록 설정)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

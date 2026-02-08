@@ -1,23 +1,22 @@
 spring:
+  config:
+      import:
+        - optional:file:.env[.properties]
   application:
     name: Project
 
   datasource:
-      url: ${DB_URL}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
-      driver-class-name: org.postgresql.Driver
-
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      # create: 매번 테이블 새로 생성 / update: 변경 사항만 반영
-      ddl-auto: update 
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        # PostgreSQL 엔진 최적화
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
   secret: ${JWT_SECRET}
