@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.Project.dto.MemoResponse;
 import com.example.Project.dto.PdfExportRequest;
 import com.example.Project.entity.QuizAnswer;
+import com.example.Project.entity.User;
 import com.example.Project.repository.QuizAnswerRepository;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -30,9 +31,10 @@ public class PdfExportService {
 
     private final MemoService memoService;
     private final QuizAnswerRepository quizAnswerRepository;
-    
+    private final AiSummaryService aiSummaryService;  // 신형 Summary 서비스
+    private final ChatService chatService;  // User 조회용
 
-    public byte[] generatePdf(PdfExportRequest request) {
+    public byte[] generatePdf(PdfExportRequest request, User user) {
         String sessionId = request.getSessionId();
         String objectName = request.getObjectName();
 
@@ -53,15 +55,17 @@ public class PdfExportService {
         }
 
         // 2. [AI 요약 데이터 조회]
-        String summaryText = "AI 요약은 팀원이 /api/ai/summary 구현 후 사용 가능합니다.";
-        // TODO: 팀원이 구현 후 아래 주석 해제
-        // try {
-        //     String summary = aiSummaryService.createSummary(sessionId, objectName);
-        //     if (summary != null) summaryText = summary;
-        // } catch (Exception e) {
-        //     log.warn("AI 요약 실패: {}", e.getMessage());
-        // }
-        
+        String summaryText = "AI 요약 생성 실패";
+        try {
+            String summary = aiSummaryService.createSummary(sessionId, user);
+            if (summary != null && !summary.isEmpty()) {
+                summaryText = summary;
+            }
+        } catch (Exception e) {
+            log.warn("AI 요약 실패: {}", e.getMessage());
+            summaryText = "AI 요약을 생성할 수 없습니다.";
+        }
+
         // 3. [퀴즈 데이터 조회]
         List<QuizAnswer> quizList = Collections.emptyList();
         try {
