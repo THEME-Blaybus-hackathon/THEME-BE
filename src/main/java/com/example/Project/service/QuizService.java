@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.Project.entity.QuizAnswer;
+import com.example.Project.entity.ChatSession;
 import com.example.Project.dto.ChatMessage;
 import com.example.Project.dto.QuizGenerateRequest;
 import com.example.Project.dto.QuizGenerateResponse;
@@ -36,7 +37,7 @@ public class QuizService {
     private final PromptService promptService;
     private final QuizRecordRepository quizRecordRepository;
     private final QuizAnswerRepository quizAnswerRepository;
-    private final ChatContextService chatContextService;
+    private final ChatService chatService;  // 신형 ChatService 사용
     private WrongAnswerNoteService wrongAnswerNoteService;
 
     // 메모리 내에서 퀴즈 세션 관리
@@ -48,12 +49,12 @@ public class QuizService {
                        PromptService promptService,
                        QuizRecordRepository quizRecordRepository, 
                        QuizAnswerRepository quizAnswerRepository, 
-                       ChatContextService chatContextService) {
+                       ChatService chatService) {
         this.openAiService = openAiService;
         this.promptService = promptService;
         this.quizRecordRepository = quizRecordRepository;
         this.quizAnswerRepository = quizAnswerRepository;
-        this.chatContextService = chatContextService;
+        this.chatService = chatService;
     }
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
@@ -70,10 +71,24 @@ public class QuizService {
         }
 
         String quizId = UUID.randomUUID().toString();
-        List<ChatMessage> chatHistory = chatContextService.getHistory(sessionId, objectName);
-
-        if (chatHistory.isEmpty()) {
+        
+        // 신형 ChatService를 사용하여 DB에서 세션 조회
+        ChatSession chatSession = chatService.getSessionBySessionId(sessionId);
+        
+        // DB에서 대화 히스토리 조회 (Entity)
+        List<com.example.Project.entity.ChatMessage> dbMessages = chatService.getSessionMessages(chatSession);
+        
+        if (dbMessages.isEmpty()) {
             throw new RuntimeException("No chat history. Please chat with AI first.");
+        }
+        
+        // Entity를 DTO로 변환
+        List<ChatMessage> chatHistory = new ArrayList<>();
+        for (com.example.Project.entity.ChatMessage msg : dbMessages) {
+            chatHistory.add(ChatMessage.builder()
+                    .role(msg.getRole())
+                    .content(msg.getContent())
+                    .build());
         }
 
         String quizPrompt = buildQuizPromptFromChat(objectName, chatHistory, questionCount);
