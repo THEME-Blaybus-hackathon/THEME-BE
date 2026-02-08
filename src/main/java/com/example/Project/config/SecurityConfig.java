@@ -52,10 +52,11 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/login", "/h2-console/**", 
                     "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**",
-                    "/auth/**", "/api/auth/**", "/api/user/**", "/api/objects/**",
-                    "/api/ai/**", "/api/memos/**", "/api/pdf/**", "/api/quiz/**",
-                    "/api/wrong-answers/**"
+                    "/auth/**", "/api/auth/**", "/api/user/**", 
+                    "/api/objects/**", "/api/object-data/**"
                 ).permitAll()
+                // AI, Memo, PDF, Quiz, Wrong-Answers API는 인증 필요
+                .requestMatchers("/api/ai/**", "/api/memos/**", "/api/pdf/**", "/api/quiz/**", "/api/wrong-answers/**").authenticated()
                 .anyRequest().authenticated()
             )
             // 2. JWT 필터 등록 (UsernamePasswordAuthenticationFilter 보다 먼저 실행되도록 설정)
