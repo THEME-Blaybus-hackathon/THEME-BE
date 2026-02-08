@@ -23,7 +23,6 @@ public class MemoController {
 
     private final MemoService memoService;
 
-    // 현재 로그인한 유저의 이메일 가져오기
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -39,12 +38,18 @@ public class MemoController {
         return ResponseEntity.ok(memoService.createMemo(email, dto));
     }
 
-    @Operation(summary = "부품별 내 메모 조회")
+    @Operation(summary = "부품별 내 메모 목록 조회")
     @GetMapping
     public ResponseEntity<List<MemoResponse>> getMemosByPart(@RequestParam String partName) {
         String email = getCurrentUserEmail();
-        // [수정] 메서드 이름과 파라미터 맞춤
         return ResponseEntity.ok(memoService.getMemosByPart(email, partName));
+    }
+
+    @Operation(summary = "ID로 메모 상세 조회")
+    @GetMapping("/{id}")
+    public ResponseEntity<MemoResponse> getMemoById(@PathVariable Long id) {
+        String email = getCurrentUserEmail();
+        return ResponseEntity.ok(memoService.getMemoById(email, id));
     }
 
     @Operation(summary = "메모 수정")

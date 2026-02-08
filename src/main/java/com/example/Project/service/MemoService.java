@@ -42,13 +42,23 @@ public class MemoService {
         return new MemoResponse(memoRepository.save(memo));
     }
 
-    // [수정] 메서드 이름 변경 (getMemos -> getMemosByPart)
     public List<MemoResponse> getMemosByPart(String email, String partName) {
         User user = getUserByEmail(email);
         return memoRepository.findByUserAndPartName(user, partName)
                 .stream()
                 .map(MemoResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public MemoResponse getMemoById(String email, Long memoId) {
+        Memo memo = memoRepository.findById(memoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메모가 존재하지 않습니다. id=" + memoId));
+        
+        if (!memo.getUser().getEmail().equals(email)) {
+            throw new IllegalArgumentException("본인의 메모만 조회할 수 있습니다.");
+        }
+
+        return new MemoResponse(memo);
     }
 
     @Transactional
