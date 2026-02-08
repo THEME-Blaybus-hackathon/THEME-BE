@@ -21,8 +21,9 @@ public class WrongAnswerNoteService {
     private final WrongAnswerNoteRepository wrongAnswerNoteRepository;
 
     @Transactional
-    public void saveWrongAnswers(String userId, String quizId, String objectName,
-            java.util.Map<String, QuizResult> results) {
+    public void saveWrongAnswers(String quizId, String objectName, java.util.Map<String, QuizResult> results) {
+        // 인증된 사용자 정보에서 userId 추출
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         if (userId == null || userId.trim().isEmpty()) {
             log.warn("userId is null or empty, skipping wrong answer save");
             return;

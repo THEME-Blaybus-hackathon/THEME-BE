@@ -3,6 +3,8 @@ package com.example.Project.controller.api;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,20 +56,12 @@ public class QuizController {
     public ResponseEntity<QuizSubmitResponse> submitQuiz(@Valid @RequestBody QuizSubmitRequest request) {
         log.info("Quiz Submit Request | quizId: {} | answers: {}",
                 request.getQuizId(), request.getAnswers().size());
-
         try {
             QuizSubmitResponse response = quizService.submitQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error submitting quiz", e);
-            return ResponseEntity.badRequest()
-                    .body(QuizSubmitResponse.builder()
-                            .totalQuestions(0)
-                            .correctAnswers(0)
-                            .wrongAnswers(0)
-                            .score(0.0)
-                            .grade("ERROR")
-                            .build());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

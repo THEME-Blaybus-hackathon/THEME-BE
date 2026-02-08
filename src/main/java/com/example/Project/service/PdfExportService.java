@@ -35,15 +35,18 @@ public class PdfExportService {
     private final ChatService chatService;
 
     public byte[] generatePdf(PdfExportRequest request, User user) {
-        String sessionId = request.getSessionId();
+        String sessionId = request.getSessionId(); // AI Summary용
+        String quizId = request.getQuizId(); // 퀴즈 데이터용
         String objectName = request.getObjectName();
+        String partName = request.getPartName(); // 메모 조회용
 
-        log.info("PDF 생성 시작 - 세션: {}, 모델: {}", sessionId, objectName);
+        log.info("PDF 생성 시작 - 세션ID: {}, 퀴즈ID: {}, 모델: {}", sessionId, quizId, objectName);
 
-        // 1. [메모 데이터 조회] - 리스트를 하나의 문자열로 합침
+        // 1. [메모 데이터 조회]
         String savedMemo = "메모 내용 없음";
         try {
-            List<MemoResponse> memos = memoService.getMemosByPart(objectName);
+            // 인증 사용자 이메일을 활용하여 메모 조회
+            List<MemoResponse> memos = memoService.getMemosByPart(user.getEmail(), partName);
             if (memos != null && !memos.isEmpty()) {
                 savedMemo = memos.stream()
                         .map(MemoResponse::getContent)
@@ -57,7 +60,7 @@ public class PdfExportService {
         // 2. [AI 요약 데이터 조회]
         String summaryText = "AI 요약 생성 실패";
         try {
-            String summary = aiSummaryService.createSummary(sessionId, user);
+            String summary = aiSummaryService.createSummary(sessionId, user); // sessionId 사용
             if (summary != null && !summary.isEmpty()) {
                 summaryText = summary;
             }
@@ -69,7 +72,7 @@ public class PdfExportService {
         // 3. [퀴즈 데이터 조회]
         List<QuizAnswer> quizList = Collections.emptyList();
         try {
-            quizList = quizAnswerRepository.findBySessionIdAndObjectNameOrderByCreatedAtDesc(sessionId, objectName);
+            quizList = quizAnswerRepository.findBySessionIdAndObjectNameOrderByCreatedAtDesc(quizId, objectName);
         } catch (Exception e) {
             log.warn("퀴즈 조회 실패: {}", e.getMessage());
         }
