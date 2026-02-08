@@ -34,13 +34,21 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("🚀 SIMVEX Platform API")
-                .description("JWT 인증 + OAuth 소셜 로그인 + AI 어시스턴트 (GPT-5-mini)\n\n"
+                .description("JWT 인증 + OAuth 소셜 로그인 + AI 어시스턴트 (GPT-4o-mini) + 세션 관리\n\n"
                         + "**주요 기능:**\n"
                         + "- 🔐 JWT 토큰 기반 인증\n"
                         + "- 🌐 OAuth 2.0 소셜 로그인 (Google, Kakao, Naver)\n"
                         + "- 🤖 3D 엔지니어링 AI 어시스턴트\n"
-                        + "- 📚 4가지 3D 모델 지원 (Jet Engine, Suspension, Robot Arm, Vice)")
-                .version("2.0.0")
+                        + "- 💾 세션 기반 대화 관리 (PostgreSQL)\n"
+                        + "- 📚 4가지 3D 모델 지원 (Drone, Robot Arm, Robot Gripper, Suspension)\n\n"
+                        + "**v2.1.0 업데이트 (2026-02-08):**\n"
+                        + "- ✅ AI 채팅 세션 관리 (날짜 기반 세션 ID: yyyyMMdd-NNN)\n"
+                        + "- ✅ 대화 히스토리 DB 저장 (chat_sessions, chat_messages 테이블)\n"
+                        + "- ✅ 토큰 폭탄 방지 (최근 20개 대화만 OpenAI 전달)\n"
+                        + "- ✅ 세션 소유권 검증 강화 (403 Forbidden)\n"
+                        + "- ✅ 트랜잭션 처리 (OpenAI 실패 시 롤백)\n"
+                        + "- ❌ 구형 API 삭제 (POST /api/ai/ask, GET /api/ai/history 등)")
+                .version("2.1.0")
                 .contact(new Contact()
                         .name("SIMVEX Development Team")
                         .email("dev@simvex.com")

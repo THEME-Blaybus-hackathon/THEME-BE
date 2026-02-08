@@ -29,8 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PdfExportService {
 
     private final MemoService memoService;
-    private final AiAssistantService aiAssistantService;
     private final QuizAnswerRepository quizAnswerRepository;
+    
 
     public byte[] generatePdf(PdfExportRequest request) {
         String sessionId = request.getSessionId();
@@ -53,14 +53,14 @@ public class PdfExportService {
         }
 
         // 2. [AI 요약 데이터 조회]
-        String summaryText = "AI 요약 생성 실패";
-        try {
-            // 이 메서드가 AiAssistantService에 있는지 확인 필요
-            String summary = aiAssistantService.createSummary(sessionId, objectName);
-            if (summary != null) summaryText = summary;
-        } catch (Exception e) {
-            log.warn("AI 요약 실패: {}", e.getMessage());
-        }
+        String summaryText = "AI 요약은 팀원이 /api/ai/summary 구현 후 사용 가능합니다.";
+        // TODO: 팀원이 구현 후 아래 주석 해제
+        // try {
+        //     String summary = aiSummaryService.createSummary(sessionId, objectName);
+        //     if (summary != null) summaryText = summary;
+        // } catch (Exception e) {
+        //     log.warn("AI 요약 실패: {}", e.getMessage());
+        // }
         
         // 3. [퀴즈 데이터 조회]
         List<QuizAnswer> quizList = Collections.emptyList();
