@@ -3,12 +3,13 @@ package com.example.Project.controller.api;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Project.entity.WrongAnswerNote;
@@ -33,7 +34,9 @@ public class WrongAnswerNoteController {
 
     @Operation(summary = "오답 노트 전체 조회", description = "사용자의 모든 오답 노트 조회")
     @GetMapping
-    public ResponseEntity<List<WrongAnswerNote>> getWrongAnswers(@RequestParam String userId) {
+    public ResponseEntity<List<WrongAnswerNote>> getWrongAnswers() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
         log.info("Get wrong answers | userId: {}", userId);
         List<WrongAnswerNote> notes = wrongAnswerNoteService.getWrongAnswers(userId);
         return ResponseEntity.ok(notes);
@@ -41,7 +44,9 @@ public class WrongAnswerNoteController {
 
     @Operation(summary = "미복습 오답 노트 조회", description = "복습하지 않은 오답만 조회")
     @GetMapping("/unreviewed")
-    public ResponseEntity<List<WrongAnswerNote>> getUnreviewedWrongAnswers(@RequestParam String userId) {
+    public ResponseEntity<List<WrongAnswerNote>> getUnreviewedWrongAnswers() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
         log.info("Get unreviewed wrong answers | userId: {}", userId);
         List<WrongAnswerNote> notes = wrongAnswerNoteService.getUnreviewedWrongAnswers(userId);
         return ResponseEntity.ok(notes);

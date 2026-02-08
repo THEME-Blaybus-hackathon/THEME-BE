@@ -27,6 +27,9 @@ import com.example.Project.entity.QuizRecord;
 import com.example.Project.repository.QuizAnswerRepository;
 import com.example.Project.repository.QuizRecordRepository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -97,6 +100,15 @@ public class QuizService {
 
         List<QuizQuestion> questions = parseQuizResponse(aiResponse, questionCount);
         
+        // 퀴즈 문제를 JSON으로 변환
+        String questionsJson = "";
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            questionsJson = mapper.writeValueAsString(questions);
+        } catch (Exception e) {
+            log.error("Quiz questions JSON serialization failed: {}", e.getMessage());
+        }
+
         // 서버 메모리에 퀴즈 정보 저장
         quizSessions.put(quizId, questions);
         quizObjectNames.put(quizId, objectName);
@@ -112,6 +124,7 @@ public class QuizService {
                 .score(0.0)
                 .grade(null)
                 .createdAt(Instant.now())
+                .questionsJson(questionsJson)
                 .build();
         quizRecordRepository.save(record);
 
@@ -129,6 +142,14 @@ public class QuizService {
 
         List<QuizQuestion> questions = parseQuizResponse(aiResponse, request.getQuestionCount());
         
+        String questionsJson = "";
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            questionsJson = mapper.writeValueAsString(questions);
+        } catch (Exception e) {
+            log.error("Quiz questions JSON serialization failed: {}", e.getMessage());
+        }
+
         quizSessions.put(quizId, questions);
         quizObjectNames.put(quizId, request.getObjectName());
         // 일반 퀴즈는 특정 채팅 세션과 연관이 없을 수 있으므로 "general" 등으로 저장하거나 null 처리
@@ -143,6 +164,7 @@ public class QuizService {
                 .score(0.0)
                 .grade(null)
                 .createdAt(Instant.now())
+                .questionsJson(questionsJson)
                 .build();
         quizRecordRepository.save(record);
 
@@ -152,28 +174,34 @@ public class QuizService {
     // 3. 퀴즈 제출 및 채점 (여기가 핵심 수정 부분)
     @Transactional
     public QuizSubmitResponse submitQuiz(QuizSubmitRequest request) {
-        List<QuizQuestion> questions = quizSessions.get(request.getQuizId());
-        if (questions == null) {
-            throw new RuntimeException("Quiz session not found");
+        // 인증된 사용자 정보 추출
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        // 퀴즈 문제를 DB에서 조회
+        QuizRecord record = quizRecordRepository.findByQuizId(request.getQuizId()).orElseThrow();
+        String questionsJson = record.getQuestionsJson();
+        List<QuizQuestion> questions = new ArrayList<>();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            questions = mapper.readValue(questionsJson, new TypeReference<List<QuizQuestion>>() {});
+        } catch (Exception e) {
+            log.error("Quiz questions JSON deserialization failed: {}", e.getMessage());
+            throw new RuntimeException("Failed to load quiz questions from DB");
+        }
+        if (questions.isEmpty()) {
+            throw new RuntimeException("Quiz questions not found in DB");
         }
 
         Map<String, QuizResult> results = new HashMap<>();
         int correctCount = 0;
 
-        // 저장해둔 메타 데이터 가져오기
-        String objectName = quizObjectNames.getOrDefault(request.getQuizId(), "Unknown");
-        String sessionId = quizSessionIds.getOrDefault(request.getQuizId(), "Unknown");
+        String objectName = record.getObjectName();
+        String sessionId = record.getQuizId(); // sessionId는 필요시 별도 저장
 
         for (QuizQuestion q : questions) {
-            String userAnswer = request.getAnswers().get(q.getId());  // "O" 또는 "X"
-            if (userAnswer == null) userAnswer = ""; // null 방지
-
+            String userAnswer = request.getAnswers().get(q.getId());
+            if (userAnswer == null) userAnswer = "";
             boolean isCorrect = userAnswer.equalsIgnoreCase(q.getCorrectAnswer());
-            if (isCorrect) {
-                correctCount++;
-            }
-
-            // 결과 맵에 추가
+            if (isCorrect) correctCount++;
             results.put(q.getId(), QuizResult.builder()
                     .questionId(q.getId())
                     .question(q.getQuestion())
@@ -182,12 +210,10 @@ public class QuizService {
                     .correctAnswer(q.getCorrectAnswer())
                     .explanation(q.getExplanation())
                     .build());
-
-            // ▼▼▼ [추가] PDF 리포트용 개별 답안 DB 저장 ▼▼▼
             try {
                 QuizAnswer answerEntity = QuizAnswer.builder()
-                        .sessionId(sessionId)      // 세션 ID (PDF 매칭용)
-                        .objectName(objectName)    // 부품명
+                        .sessionId(sessionId)
+                        .objectName(objectName)
                         .question(q.getQuestion())
                         .userAnswer(userAnswer)
                         .correctAnswer(q.getCorrectAnswer())
@@ -195,33 +221,25 @@ public class QuizService {
                         .explanation(q.getExplanation())
                         .createdAt(LocalDateTime.now())
                         .build();
-                
                 quizAnswerRepository.save(answerEntity);
             } catch (Exception e) {
                 log.error("Failed to save individual quiz answer for PDF: {}", e.getMessage());
-                // 전체 채점 로직이 멈추지 않도록 예외는 로그만 찍고 넘어감
             }
         }
 
         double score = correctCount * 10.0;
         String grade = null;
 
-        // 전체 기록 업데이트
-        QuizRecord record = quizRecordRepository.findByQuizId(request.getQuizId()).orElseThrow();
-        record.setUserId(request.getUserId());
+        record.setUserId(userId); // 인증된 사용자 정보로 저장
         record.setCorrectAnswers(correctCount);
         record.setScore(score);
         record.setGrade(grade);
         record.setSubmittedAt(Instant.now());
         quizRecordRepository.save(record);
 
-        // 오답 노트 서비스 호출 (옵션)
-        if (wrongAnswerNoteService != null
-                && request.getUserId() != null
-                && !request.getUserId().trim().isEmpty()) {
+        if (wrongAnswerNoteService != null && userId != null && !userId.trim().isEmpty()) {
             if (objectName != null) {
                 wrongAnswerNoteService.saveWrongAnswers(
-                        request.getUserId(),
                         request.getQuizId(),
                         objectName,
                         results

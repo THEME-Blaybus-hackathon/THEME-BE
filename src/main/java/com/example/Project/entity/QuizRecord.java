@@ -54,4 +54,7 @@ public class QuizRecord {
 
     @Column
     private Instant submittedAt;
+
+    @Column(length = 5000)
+    private String questionsJson; // 퀴즈 문제 리스트(JSON)
 }
