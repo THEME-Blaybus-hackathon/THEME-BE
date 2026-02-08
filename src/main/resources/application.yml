@@ -55,6 +55,11 @@ openai:
     model: ${OPENAI_MODEL}
     url: https://api.openai.com/v1/chat/completions
 
+# AI Chat Configuration
+ai:
+  chat:
+    history-limit: 20  # OpenAI API로 전달할 최대 히스토리 개수 (토큰 절약)
+
 # OAuth Configuration (공통 URL, 환경별 콜백은 프로파일에서 오버라이드)
 sns:
   google:
