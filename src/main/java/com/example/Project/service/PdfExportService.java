@@ -31,8 +31,8 @@ public class PdfExportService {
 
     private final MemoService memoService;
     private final QuizAnswerRepository quizAnswerRepository;
-    private final AiSummaryService aiSummaryService;  // 신형 Summary 서비스
-    private final ChatService chatService;  // User 조회용
+    private final AiSummaryService aiSummaryService;
+    private final ChatService chatService;
 
     public byte[] generatePdf(PdfExportRequest request, User user) {
         String sessionId = request.getSessionId();

@@ -49,7 +49,7 @@ public class PdfController {
             // 서비스 호출
             byte[] pdfFile = pdfExportService.generatePdf(request, user);
 
-            // 파일명 인코딩 (한글 파일명 깨짐 방지)
+            // 파일명 인코딩
             String filename = "Report_" + request.getObjectName() + ".pdf";
             String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString())
                     .replaceAll("\\+", "%20");
