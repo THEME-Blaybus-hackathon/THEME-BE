@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.Project.dto.MemoResponse;
 import com.example.Project.dto.PdfExportRequest;
 import com.example.Project.entity.QuizAnswer;
+import com.example.Project.entity.User;
 import com.example.Project.repository.QuizAnswerRepository;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -28,9 +29,10 @@ public class PdfExportService {
 
     private final MemoService memoService;
     private final QuizAnswerRepository quizAnswerRepository;
-    
+    private final AiSummaryService aiSummaryService;  // 신형 Summary 서비스
+    private final ChatService chatService;  // User 조회용
 
-    public byte[] generatePdf(String email, PdfExportRequest request) {
+    public byte[] generatePdf(PdfExportRequest request, User user) {
         String sessionId = request.getSessionId();
         String objectName = request.getObjectName();
 
@@ -52,9 +54,18 @@ public class PdfExportService {
         }
 
         // 2. [AI 요약 데이터 조회]
-        String summaryText = "AI 요약은 팀원이 /api/ai/summary 구현 후 사용 가능합니다.";
-        
-        // 3. [퀴즈 데이터 조회] (가정: Repository 메서드 존재)
+        String summaryText = "AI 요약 생성 실패";
+        try {
+            String summary = aiSummaryService.createSummary(sessionId, user);
+            if (summary != null && !summary.isEmpty()) {
+                summaryText = summary;
+            }
+        } catch (Exception e) {
+            log.warn("AI 요약 실패: {}", e.getMessage());
+            summaryText = "AI 요약을 생성할 수 없습니다.";
+        }
+
+        // 3. [퀴즈 데이터 조회]
         List<QuizAnswer> quizList = Collections.emptyList();
         try {
              // 이 메서드도 Repository에 실제 존재하는지 확인 필요 (없으면 에러 남)

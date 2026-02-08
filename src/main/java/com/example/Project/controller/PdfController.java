@@ -6,14 +6,16 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Project.dto.PdfExportRequest;
+import com.example.Project.entity.User;
+import com.example.Project.repository.UserRepository;
 import com.example.Project.service.PdfExportService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PdfController {
 
     private final PdfExportService pdfExportService;
+    private final UserRepository userRepository;
 
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -40,12 +43,19 @@ public class PdfController {
 
     @Operation(summary = "PDF 리포트 다운로드", description = "요약, 퀴즈 결과, 대화 내용을 포함한 PDF를 생성하여 다운로드합니다.")
     @PostMapping("/download")
-    public ResponseEntity<byte[]> downloadReport(@RequestBody PdfExportRequest request) {
-        log.info("PDF Download Request | session: {} | object: {}", request.getSessionId(), request.getObjectName());
+    public ResponseEntity<byte[]> downloadReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody PdfExportRequest request) {
+        log.info("PDF Download Request | user: {} | session: {} | object: {}", 
+                userDetails.getUsername(), request.getSessionId(), request.getObjectName());
 
         try {
-            String email = getCurrentUserEmail();
-            byte[] pdfFile = pdfExportService.generatePdf(email, request);
+            // 사용자 조회
+            User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            // 서비스 호출
+            byte[] pdfFile = pdfExportService.generatePdf(request, user);
 
             String filename = "Report_" + request.getObjectName() + ".pdf";
             String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString())
