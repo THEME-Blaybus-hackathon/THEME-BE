@@ -1,4 +1,5 @@
 -- 1. 카테고리 데이터 (LearningObjectCategory)
+-- 이미 존재하면 무시 (ON CONFLICT DO NOTHING)
 INSERT INTO learning_object_categories (id, main_image_url) VALUES 
 ('v4_engine', '/asset/v4_engine/main_image.png'),
 ('suspension', '/asset/suspension/main_image.png'),
@@ -6,9 +7,11 @@ INSERT INTO learning_object_categories (id, main_image_url) VALUES
 ('robot_arm', '/asset/robot_arm/main_image.png'),
 ('machine_vice', '/asset/machine_vice/main_image.png'),
 ('leaf_spring', '/asset/leaf_spring/main_image.png'),
-('drone', '/asset/drone/main_image.png');
+('drone', '/asset/drone/main_image.png')
+ON CONFLICT (id) DO NOTHING;
 
 -- 2. 부품 데이터 (LearningObject) - mesh_name 추가 (GLB 파일명 기반)
+-- 이미 존재하면 무시 (ON CONFLICT DO NOTHING)
 
 -- V4 Engine (7개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -18,7 +21,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (4, 'Piston Pin', '연결 핀', '/asset/v4_engine/piston_pin.glb', '/asset/v4_engine/piston_pin.glb', 'piston_pin', 'v4_engine'),
 (5, 'Piston Ring', '밀폐 링', '/asset/v4_engine/piston_ring.glb', '/asset/v4_engine/piston_ring.glb', 'piston_ring', 'v4_engine'),
 (6, 'Rod Cap', '로드 캡', '/asset/v4_engine/rod_cap.glb', '/asset/v4_engine/rod_cap.glb', 'rod_cap', 'v4_engine'),
-(7, 'Conrod Bolt', '체결 볼트', '/asset/v4_engine/bolt.glb', '/asset/v4_engine/bolt.glb', 'bolt', 'v4_engine');
+(7, 'Conrod Bolt', '체결 볼트', '/asset/v4_engine/bolt.glb', '/asset/v4_engine/bolt.glb', 'bolt', 'v4_engine')
+ON CONFLICT (id) DO NOTHING;
 
 -- Suspension (5개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -26,7 +30,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (11, 'Coil Spring', '노면의 충격을 흡수하는 코일 스프링', '/asset/suspension/spring.glb', '/asset/suspension/spring.glb', 'spring', 'suspension'),
 (12, 'Shock Rod', '충격 흡수기(쇼바)의 중심 축', '/asset/suspension/rod.glb', '/asset/suspension/rod.glb', 'rod', 'suspension'),
 (13, 'Lock Nut', '부품을 단단히 고정하는 너트', '/asset/suspension/nut.glb', '/asset/suspension/nut.glb', 'nut', 'suspension'),
-(14, 'Fixing Pin', '부품 간 연결을 위한 고정 핀', '/asset/suspension/nit.glb', '/asset/suspension/nit.glb', 'nit', 'suspension');
+(14, 'Fixing Pin', '부품 간 연결을 위한 고정 핀', '/asset/suspension/nit.glb', '/asset/suspension/nit.glb', 'nit', 'suspension')
+ON CONFLICT (id) DO NOTHING;
 
 -- Robot Gripper (8개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -37,7 +42,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (24, 'Connecting Link', '관절을 이어주는 연결 링크', '/asset/robot_gripper/link.glb', '/asset/robot_gripper/link.glb', 'link', 'robot_gripper'),
 (25, 'Gripper Jaw', '물체를 실제로 집는 집게 부분', '/asset/robot_gripper/gripper.glb', '/asset/robot_gripper/gripper.glb', 'Gripper', 'robot_gripper'),
 (26, 'Fixing Pin', '각 부품을 고정하는 회전 핀', '/asset/robot_gripper/pin.glb', '/asset/robot_gripper/pin.glb', 'pin', 'robot_gripper'),
-(27, 'Base Gear', '베이스 부분에 위치한 기어 부품', '/asset/robot_gripper/base_gear.glb', '/asset/robot_gripper/base_gear.glb', 'base_gear', 'robot_gripper');
+(27, 'Base Gear', '베이스 부분에 위치한 기어 부품', '/asset/robot_gripper/base_gear.glb', '/asset/robot_gripper/base_gear.glb', 'base_gear', 'robot_gripper')
+ON CONFLICT (id) DO NOTHING;
 
 -- Robot Arm (8개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -48,7 +54,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (34, 'Arm Part 5', '로봇 팔 연결 부품 5', '/asset/robot_arm/part_5.glb', '/asset/robot_arm/part_5.glb', 'part_5', 'robot_arm'),
 (35, 'Arm Part 6', '로봇 팔 연결 부품 6', '/asset/robot_arm/part_6.glb', '/asset/robot_arm/part_6.glb', 'part_6', 'robot_arm'),
 (36, 'Arm Part 7', '로봇 팔 연결 부품 7', '/asset/robot_arm/part_7.glb', '/asset/robot_arm/part_7.glb', 'part_7', 'robot_arm'),
-(37, 'Arm Part 8', '로봇 팔 연결 부품 8', '/asset/robot_arm/part_8.glb', '/asset/robot_arm/part_8.glb', 'part_8', 'robot_arm');
+(37, 'Arm Part 8', '로봇 팔 연결 부품 8', '/asset/robot_arm/part_8.glb', '/asset/robot_arm/part_8.glb', 'part_8', 'robot_arm')
+ON CONFLICT (id) DO NOTHING;
 
 -- Machine Vice (10개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -61,7 +68,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (46, 'Guide Rail', '이동 죠가 미끄러지듯 움직이는 레일', '/asset/machine_vice/part_6.glb', '/asset/machine_vice/part_6.glb', 'part_6', 'machine_vice'),
 (47, 'Spindle Shaft', '회전력을 직선 운동으로 바꾸는 나사 축', '/asset/machine_vice/part_7.glb', '/asset/machine_vice/part_7.glb', 'part_7', 'machine_vice'),
 (48, 'Base Plate', '바이스 전체를 지지하는 바닥판', '/asset/machine_vice/part_8.glb', '/asset/machine_vice/part_8.glb', 'part_8', 'machine_vice'),
-(49, 'Pressure Sleeve', '축의 압력을 전달하는 슬리브', '/asset/machine_vice/part_9.glb', '/asset/machine_vice/part_9.glb', 'part_9', 'machine_vice');
+(49, 'Pressure Sleeve', '축의 압력을 전달하는 슬리브', '/asset/machine_vice/part_9.glb', '/asset/machine_vice/part_9.glb', 'part_9', 'machine_vice')
+ON CONFLICT (id) DO NOTHING;
 
 -- Leaf Spring (9개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -73,7 +81,8 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (55, 'Chassis Support', '차체와 연결되는 지지대', '/asset/leaf_spring/support_chassis.glb', '/asset/leaf_spring/support_chassis.glb', 'support_chassis', 'leaf_spring'),
 (56, 'Rubber Bushing (60mm)', '진동을 흡수하는 60mm 고무 부싱', '/asset/leaf_spring/support_rubber_60mm.glb', '/asset/leaf_spring/support_rubber_60mm.glb', 'support_rubber_60mm', 'leaf_spring'),
 (57, 'Rubber Bushing', '진동 흡수 고무 부품', '/asset/leaf_spring/support_rubber.glb', '/asset/leaf_spring/support_rubber.glb', 'support_rubber', 'leaf_spring'),
-(58, 'Main Support', '스프링 전체를 받쳐주는 지지대', '/asset/leaf_spring/support.glb', '/asset/leaf_spring/support.glb', 'support', 'leaf_spring');
+(58, 'Main Support', '스프링 전체를 받쳐주는 지지대', '/asset/leaf_spring/support.glb', '/asset/leaf_spring/support.glb', 'support', 'leaf_spring')
+ON CONFLICT (id) DO NOTHING;
 
 -- Drone (10개)
 INSERT INTO learning_objects (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
@@ -86,4 +95,5 @@ INSERT INTO learning_objects (id, name, description, model_url, assembly_url, me
 (66, 'Beater Disc', '회전 동작을 제어하는 디스크', '/asset/drone/beater_disc.glb', '/asset/drone/beater_disc.glb', 'beater_disc', 'drone'),
 (67, 'Fixing Nut', '부품 고정용 너트', '/asset/drone/nut.glb', '/asset/drone/nut.glb', 'nut', 'drone'),
 (68, 'Assembly Screw', '부품 체결용 스크류', '/asset/drone/screw.glb', '/asset/drone/screw.glb', 'screw', 'drone'),
-(69, 'XYZ Sensor Module', '위치/자세 제어 센서 모듈', '/asset/drone/xyz.glb', '/asset/drone/xyz.glb', 'xyz', 'drone');
+(69, 'XYZ Sensor Module', '위치/자세 제어 센서 모듈', '/asset/drone/xyz.glb', '/asset/drone/xyz.glb', 'xyz', 'drone')
+ON CONFLICT (id) DO NOTHING;
