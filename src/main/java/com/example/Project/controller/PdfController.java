@@ -33,14 +33,6 @@ public class PdfController {
     private final PdfExportService pdfExportService;
     private final UserRepository userRepository;
 
-    private String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("로그인이 필요한 서비스입니다.");
-        }
-        return authentication.getName();
-    }
-
     @Operation(summary = "PDF 리포트 다운로드", description = "요약, 퀴즈 결과, 대화 내용을 포함한 PDF를 생성하여 다운로드합니다.")
     @PostMapping("/download")
     public ResponseEntity<byte[]> downloadReport(
@@ -58,7 +50,6 @@ public class PdfController {
             byte[] pdfFile = pdfExportService.generatePdf(request, user);
 
             // 파일명 인코딩
-
             String filename = "Report_" + request.getObjectName() + ".pdf";
             String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString())
                     .replaceAll("\\+", "%20");
