@@ -36,7 +36,7 @@ public class MemoService {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .partName(dto.getPartName())
-                .user(user)
+                .user(user) // ★ 여기서 넣은 유저가 이제 DB user_id로 잘 들어갈 겁니다.
                 .build();
 
         return new MemoResponse(memoRepository.save(memo));
@@ -44,7 +44,8 @@ public class MemoService {
 
     public List<MemoResponse> getMemosByPart(String email, String partName) {
         User user = getUserByEmail(email);
-        return memoRepository.findByUserAndPartName(user, partName)
+        // ★ 최신순 정렬 메서드로 교체
+        return memoRepository.findByUserAndPartNameOrderByCreatedAtDesc(user, partName)
                 .stream()
                 .map(MemoResponse::new)
                 .collect(Collectors.toList());
