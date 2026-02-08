@@ -22,6 +22,9 @@ public class LearningObject {
     private String imageUrl;
     private String modelUrl;
     private String assemblyUrl;
+    
+    @Column(name = "mesh_name", length = 100)
+    private String meshName;  // GLB 파일 내부 Mesh 이름 (파일명 기반)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
