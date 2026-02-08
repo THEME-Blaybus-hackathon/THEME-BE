@@ -49,6 +49,7 @@ public class ObjectDataService {
                 .imageUrl(obj.getImageUrl())
                 .modelUrl(obj.getModelUrl())
                 .assemblyUrl(obj.getAssemblyUrl())
+                .meshName(obj.getMeshName())
                 .category(obj.getCategory().getId())
                 .build();
     }

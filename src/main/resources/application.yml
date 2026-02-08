@@ -1,6 +1,31 @@
 spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
   application:
     name: Project
+
+  # Database Configuration (Neon DB - PostgreSQL)
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
 # Logging (공통)
 logging:
