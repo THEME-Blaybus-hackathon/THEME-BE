@@ -35,4 +35,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
      * 특정 세션의 모든 메시지 삭제
      */
     void deleteBySession(ChatSession session);
+
+    /**
+     * sessionId로 메시지 전체 조회 (시간순)
+     */
+    @Query("SELECT m FROM ChatMessage m WHERE m.session.id = :sessionId ORDER BY m.createdAt ASC")
+    List<ChatMessage> findBySessionIdOrderByCreatedAtAsc(@Param("sessionId") Long sessionId);
 }

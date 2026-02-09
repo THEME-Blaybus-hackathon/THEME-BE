@@ -23,6 +23,8 @@ import com.example.Project.repository.UserRepository;
 import com.example.Project.service.AiChatService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+// Swagger용 ApiResponse는 어노테이션에서만 풀네임 사용
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -120,6 +122,25 @@ public class AiAssistantController {
                     userDetails.getUsername(), sessionId, e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Operation(
+        summary = "모델별 전체 채팅 히스토리 조회",
+        description = "objectName(모델명) 기준으로 해당 사용자의 모든 세션과 대화 내역을 반환합니다."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공, 세션별 대화 리스트 반환"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패 (JWT 필요)")
+    })
+    @GetMapping("/chat/history/all")
+    public ResponseEntity<List<ChatHistoryResponse>> getAllChatHistoryByObject(
+            @io.swagger.v3.oas.annotations.Parameter(description = "모델명(objectName)", example = "drone", required = true)
+            @RequestParam String objectName,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<ChatHistoryResponse> historyList = aiChatService.getAllChatHistoryByObjectForUser(user.getId(), objectName);
+        return ResponseEntity.ok(historyList);
     }
 
     @Operation(
