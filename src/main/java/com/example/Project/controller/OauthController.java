@@ -2,6 +2,7 @@ package com.example.Project.controller;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +40,9 @@ public class OauthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Value("${frontend.redirect-url}")
+    private String frontendRedirectUrl;
+
     @Operation(
             summary = "OAuth 로그인 시작",
             description = "소셜 로그인 제공자의 인증 페이지로 리다이렉트합니다. (Google, Kakao, Naver)"
@@ -54,7 +58,6 @@ public class OauthController {
 
         log.info("🔐 OAuth login initiated: {} (type: {})", socialLoginType, type);
 
-        // API 요청 타입 세션에 저장
         if (OAUTH_TYPE_API.equalsIgnoreCase(type)) {
             session.setAttribute(OAUTH_TYPE_SESSION_KEY, OAUTH_TYPE_API);
         }
@@ -77,73 +80,47 @@ public class OauthController {
 
         log.info("🔑 OAuth callback received from {}", socialLoginType);
 
-        // 1. Authorization Code → Access Token
         String accessToken = oauthService.requestAccessToken(socialLoginType, code);
         if (accessToken == null) {
             log.error("❌ Failed to get access token");
             handleOAuthError(response, session, "액세스 토큰 획득 실패");
             return;
         }
-        log.debug("✅ Access token obtained");
 
-        // 2. Access Token → User Info
         OAuthUserInfo userInfo = oauthService.getUserInfo(socialLoginType, accessToken);
         if (userInfo == null) {
             log.error("❌ Failed to get user info");
             handleOAuthError(response, session, "사용자 정보 획득 실패");
             return;
         }
-        log.info("✅ User info obtained: {}", userInfo.getEmail());
 
-        // 3. 기존 사용자 확인
         User user = authService.findOAuthUser(userInfo);
         boolean isApiRequest = isApiRequest(session);
 
-        // 4-1. 신규 사용자
         if (user == null) {
             handleNewUser(userInfo, isApiRequest, response, session);
             return;
         }
 
-        // 4-2. 기존 사용자
         handleExistingUser(user, isApiRequest, response, session);
     }
 
-    /**
-     * 신규 사용자 처리
-     */
     private void handleNewUser(OAuthUserInfo userInfo, boolean isApiRequest,
                                HttpServletResponse response, HttpSession session) throws IOException {
-        log.info("👤 New user detected: {}", userInfo.getEmail());
-
-        // 자동 회원가입 + JWT 반환 (프론트엔드로 리다이렉트)
-        log.info("🔧 Auto signup and redirect to frontend");
         User newUser = authService.signupOAuthUser(userInfo, userInfo.getEmail());
         respondWithJwt(response, session, newUser, true);
     }
 
-    /**
-     * 기존 사용자 처리
-     */
     private void handleExistingUser(User user, boolean isApiRequest,
                                     HttpServletResponse response, HttpSession session) throws IOException {
-        log.info("✅ Existing user login: {}", user.getEmail());
-
-        // 모든 OAuth 로그인은 프론트엔드로 리다이렉트 (JWT 방식 통일)
         respondWithJwt(response, session, user, false);
     }
 
-    /**
-     * API 요청 여부 확인
-     */
     private boolean isApiRequest(HttpSession session) {
         String oauthType = (String) session.getAttribute(OAUTH_TYPE_SESSION_KEY);
         return OAUTH_TYPE_API.equalsIgnoreCase(oauthType);
     }
 
-    /**
-     * JWT 토큰 응답 (프론트엔드로 리다이렉트)
-     */
     private void respondWithJwt(HttpServletResponse response, HttpSession session,
                                 User user, boolean isNewUser) throws IOException {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
@@ -151,8 +128,7 @@ public class OauthController {
 
         session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
 
-        // 프론트엔드로 리다이렉트 (Query String으로 토큰 전달)
-        String frontendUrl = "http://localhost:5173/"
+        String frontendUrl = frontendRedirectUrl
                 + "?accessToken=" + accessToken
                 + "&refreshToken=" + refreshToken
                 + "&isNewUser=" + isNewUser;
@@ -162,12 +138,8 @@ public class OauthController {
         log.info("✅ JWT tokens issued, redirecting to frontend (isNewUser: {})", isNewUser);
     }
 
-    /**
-     * OAuth 에러 처리
-     */
     private void handleOAuthError(HttpServletResponse response, HttpSession session,
                                   String errorMessage) throws IOException {
-        log.error("❌ OAuth error: {}", errorMessage);
 
         boolean isApiRequest = isApiRequest(session);
         session.removeAttribute(OAUTH_TYPE_SESSION_KEY);
