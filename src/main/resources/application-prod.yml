@@ -2,22 +2,22 @@
 # Production Environment Configuration (Render)
 # ============================================
 spring:
-  # PostgreSQL Database (Render 제공)
   datasource:
     url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
-  # H2 Console 비활성화
   h2:
     console:
       enabled: false
 
-  # JPA Configuration (PostgreSQL)
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update  # ⚠️ 운영에서는 validate 권장
+      ddl-auto: update
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         format_sql: false
@@ -25,30 +25,56 @@ spring:
           lob:
             non_contextual_creation: true
 
-# Logging (운영 환경)
+# ======================
+# Server (Render)
+# ======================
+server:
+  port: ${PORT:8080}
+
+# ======================
+# Actuator (Health Check)
+# ======================
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+# ======================
+# Logging
+# ======================
 logging:
   level:
     root: INFO
     org.springframework.security: INFO
     org.springframework.web: INFO
-    com.example.Project: INFO
     org.hibernate.SQL: WARN
+    com.example.Project: INFO
 
-# JWT Configuration (Render 환경변수)
+# ======================
+# JWT
+# ======================
 jwt:
   secret: ${JWT_SECRET}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:3600000}
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
 
-# OpenAI Configuration (Render 환경변수)
+# ======================
+# OpenAI
+# ======================
 openai:
   api:
     key: ${OPENAI_API_KEY}
-    model: ${OPENAI_MODEL:gpt-4o-mini}
+    model: ${OPENAI_MODEL:gpt-5-mini}
     url: https://api.openai.com/v1/chat/completions
 
-# OAuth Callback URLs (Render 도메인)
-# ⚠️ RENDER_EXTERNAL_URL은 Render가 자동 제공
+# ======================
+# OAuth Callback (Render)
+# ======================
 sns:
   google:
     callback:
@@ -59,26 +85,3 @@ sns:
   naver:
     callback:
       url: ${RENDER_EXTERNAL_URL}/auth/naver/callback
-
-# Server Configuration
-server:
-  port: ${PORT:8080}  # Render가 PORT 환경변수 자동 제공
-  compression:
-    enabled: true
-  error:
-    include-message: always
-    include-binding-errors: always
-
-# Spring Boot Actuator (Health Check)
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: when-authorized
-  health:
-    defaults:
-      enabled: true
