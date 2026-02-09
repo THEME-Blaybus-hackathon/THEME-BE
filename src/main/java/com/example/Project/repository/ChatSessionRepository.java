@@ -39,4 +39,10 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
      */
     @Query("SELECT COUNT(cs) FROM ChatSession cs WHERE cs.createdAt >= :startOfDay")
     long countByCreatedAtAfter(@Param("startOfDay") LocalDateTime startOfDay);
+
+    /**
+     * 오늘 날짜로 시작하는 sessionId 중 가장 큰 순번 추출 (세션ID 중복 방지)
+     */
+    @Query("SELECT MAX(CAST(SUBSTRING(cs.sessionId, 10, 3) AS int)) FROM ChatSession cs WHERE cs.sessionId LIKE CONCAT(:datePrefix, '-%')")
+    Integer findMaxSequenceByDatePrefix(@Param("datePrefix") String datePrefix);
 }
