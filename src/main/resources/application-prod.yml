@@ -100,4 +100,4 @@ springdoc:
     path: /swagger-ui.html
 
 frontend:
-  redirect-url: https://theme-fe.onrender.com
+  redirect-url: https://simvex.pages.dev/
