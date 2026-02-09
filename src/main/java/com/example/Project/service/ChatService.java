@@ -62,19 +62,13 @@ public class ChatService {
     /**
      * 직관적인 세션 ID 생성
      * 형식: yyyyMMdd-NNN (예: 20260208-001, 20260208-002)
+     * 세션 삭제와 상관없이 오늘 날짜의 최대 순번 + 1로 생성
      */
     private String generateSessionId() {
-        // 1. 오늘 날짜 접두사
         String datePrefix = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        
-        // 2. 오늘 생성된 세션 개수 조회
-        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        long todayCount = sessionRepository.countByCreatedAtAfter(startOfDay);
-        
-        // 3. 순번 생성 (3자리, 001부터 시작)
-        String sequence = String.format("%03d", todayCount + 1);
-        
-        // 4. 최종 세션 ID
+        Integer maxSeq = sessionRepository.findMaxSequenceByDatePrefix(datePrefix);
+        int nextSeq = (maxSeq != null ? maxSeq : 0) + 1;
+        String sequence = String.format("%03d", nextSeq);
         return datePrefix + "-" + sequence;
     }
 

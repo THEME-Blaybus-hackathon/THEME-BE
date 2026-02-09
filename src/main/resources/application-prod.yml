@@ -77,11 +77,24 @@ openai:
 # ======================
 sns:
   google:
+    url: https://accounts.google.com/o/oauth2/v2/auth
     callback:
       url: ${RENDER_EXTERNAL_URL}/auth/google/callback
+
   kakao:
+    url: https://kauth.kakao.com/oauth/authorize
     callback:
       url: ${RENDER_EXTERNAL_URL}/auth/kakao/callback
+
   naver:
+    url: https://nid.naver.com/oauth2.0/authorize
     callback:
       url: ${RENDER_EXTERNAL_URL}/auth/naver/callback
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

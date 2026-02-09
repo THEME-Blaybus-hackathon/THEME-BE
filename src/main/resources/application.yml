@@ -2,91 +2,106 @@ spring:
   config:
     import:
       - optional:file:.env[.properties]
+
   application:
     name: Project
 
-  # Database Configuration (Neon DB - PostgreSQL)
+  # =========================
+  # Database (환경변수 기반)
+  # =========================
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  
+
+  # =========================
+  # JPA
+  # =========================
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: true
-  
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:data.sql
 
-# Logging (공통)
-logging:
-  level:
-    org.springframework.security: INFO
-    com.example.Project: INFO
+# =========================
+# Swagger (LOCAL ON)
+# =========================
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
 
-# JWT Configuration
+# =========================
+# JWT
+# =========================
 jwt:
   secret: ${JWT_SECRET}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:3600000}
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
 
-# Swagger Configuration
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-
-# OpenAI Configuration
+# =========================
+# OpenAI
+# =========================
 openai:
   api:
     key: ${OPENAI_API_KEY}
-    model: ${OPENAI_MODEL}
+    model: ${OPENAI_MODEL:gpt-5-mini}
     url: https://api.openai.com/v1/chat/completions
 
-# AI Chat Configuration
-ai:
-  chat:
-    history-limit: 20  # OpenAI API로 전달할 최대 히스토리 개수 (토큰 절약)
-
-# OAuth Configuration (공통 URL, 환경별 콜백은 프로파일에서 오버라이드)
+# =========================
+# OAuth (LOCAL)
+# =========================
 sns:
   google:
     url: https://accounts.google.com/o/oauth2/v2/auth
     client:
       id: ${GOOGLE_CLIENT_ID}
       secret: ${GOOGLE_CLIENT_SECRET}
+    callback:
+      url: http://localhost:8080/auth/google/callback
     token:
       url: https://oauth2.googleapis.com/token
     userinfo:
       url: https://www.googleapis.com/oauth2/v2/userinfo
-
   kakao:
     url: https://kauth.kakao.com/oauth/authorize
     client:
       id: ${KAKAO_CLIENT_ID}
+      secret: ${KAKAO_CLIENT_SECRET}
+    callback:
+      url: http://localhost:8080/auth/kakao/callback
     token:
       url: https://kauth.kakao.com/oauth/token
     userinfo:
       url: https://kapi.kakao.com/v2/user/me
-
   naver:
     url: https://nid.naver.com/oauth2.0/authorize
     client:
       id: ${NAVER_CLIENT_ID}
       secret: ${NAVER_CLIENT_SECRET}
+    callback:
+      url: http://localhost:8080/auth/naver/callback
     token:
       url: https://nid.naver.com/oauth2.0/token
     userinfo:
       url: https://openapi.naver.com/v1/nid/me
+
+# =========================
+# Server
+# =========================
+server:
+  port: 8080
+
+# =========================
+# Logging
+# =========================
+logging:
+  level:
+    root: INFO
+    com.example.Project: INFO
