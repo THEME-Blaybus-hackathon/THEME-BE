@@ -105,3 +105,6 @@ logging:
   level:
     root: INFO
     com.example.Project: INFO
+
+frontend:
+  redirect-url: http://localhost:5173

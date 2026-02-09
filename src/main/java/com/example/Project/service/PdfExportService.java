@@ -35,17 +35,19 @@ public class PdfExportService {
     private final ChatService chatService;
 
     public byte[] generatePdf(PdfExportRequest request, User user) {
-        String sessionId = request.getSessionId(); // AI Summary용
-        String quizId = request.getQuizId(); // 퀴즈 데이터용
+
+        String sessionId = request.getSessionId();
+        String quizId = request.getQuizId();
         String objectName = request.getObjectName();
-        String partName = request.getPartName(); // 메모 조회용
+        String partName = request.getPartName();
 
-        log.info("PDF 생성 시작 - 세션ID: {}, 퀴즈ID: {}, 모델: {}", sessionId, quizId, objectName);
+        log.info("📄 PDF 생성 시작 - sessionId={}, quizId={}, object={}", sessionId, quizId, objectName);
 
-        // 1. [메모 데이터 조회]
+        // =========================
+        // 1. 메모 조회
+        // =========================
         String savedMemo = "메모 내용 없음";
         try {
-            // 인증 사용자 이메일을 활용하여 메모 조회
             List<MemoResponse> memos = memoService.getMemosByPart(user.getEmail(), partName);
             if (memos != null && !memos.isEmpty()) {
                 savedMemo = memos.stream()
@@ -54,30 +56,36 @@ public class PdfExportService {
                 savedMemo = "- " + savedMemo;
             }
         } catch (Exception e) {
-            log.warn("메모 조회 실패: {}", e.getMessage());
+            log.warn("⚠️ 메모 조회 실패", e);
         }
 
-        // 2. [AI 요약 데이터 조회]
-        String summaryText = "AI 요약 생성 실패";
+        // =========================
+        // 2. AI 요약
+        // =========================
+        String summaryText = "AI 요약을 생성할 수 없습니다.";
         try {
-            String summary = aiSummaryService.createSummary(sessionId, user); // sessionId 사용
-            if (summary != null && !summary.isEmpty()) {
+            String summary = aiSummaryService.createSummary(sessionId, user);
+            if (summary != null && !summary.isBlank()) {
                 summaryText = summary;
             }
         } catch (Exception e) {
-            log.warn("AI 요약 실패: {}", e.getMessage());
-            summaryText = "AI 요약을 생성할 수 없습니다.";
+            log.warn("⚠️ AI 요약 실패", e);
         }
 
-        // 3. [퀴즈 데이터 조회]
+        // =========================
+        // 3. 퀴즈 조회
+        // =========================
         List<QuizAnswer> quizList = Collections.emptyList();
         try {
-            quizList = quizAnswerRepository.findBySessionIdAndObjectNameOrderByCreatedAtDesc(quizId, objectName);
+            quizList = quizAnswerRepository
+                    .findBySessionIdAndObjectNameOrderByCreatedAtDesc(quizId, objectName);
         } catch (Exception e) {
-            log.warn("퀴즈 조회 실패: {}", e.getMessage());
+            log.warn("⚠️ 퀴즈 조회 실패", e);
         }
 
-        // 4. [PDF 생성 도구 준비]
+        // =========================
+        // 4. PDF 생성
+        // =========================
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -85,27 +93,32 @@ public class PdfExportService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // --- 한글 폰트 설정 (맥/윈도우 공용 안전빵 설정) ---
-        BaseFont baseFont;
-        try {
-            // 맥북 기본 폰트 경로 (AppleGothic 또는 NanumGothic)
-            // .ttc 파일의 경우 경로 뒤에 ",0" 또는 ",1"을 붙여 인덱스를 지정해야 합니다.
-            String fontPath = "/System/Library/Fonts/Supplemental/AppleGothic.ttf"; 
-            baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        } catch (Exception e) {
-            log.warn("시스템 폰트 로드 실패, 폰트 파일이 해당 경로에 없는지 확인하세요: {}", e.getMessage());
-            // 최후의 수단: 하지만 한글은 여전히 깨질 수 있음
-            baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-}
-            
+            // ---- 한글 폰트 (OS 독립, Render 안전) ----
+            BaseFont baseFont;
+            try {
+                baseFont = BaseFont.createFont(
+                        "fonts/NanumGothic.ttf",
+                        BaseFont.IDENTITY_H,
+                        BaseFont.EMBEDDED
+                );
+            } catch (Exception e) {
+                log.error("❌ PDF 한글 폰트 로드 실패", e);
+                throw new RuntimeException("PDF 폰트 로드 실패");
+            }
+
             Font titleFont = new Font(baseFont, 20, Font.BOLD);
             Font sectionFont = new Font(baseFont, 14, Font.BOLD, BaseColor.DARK_GRAY);
             Font bodyFont = new Font(baseFont, 10, Font.NORMAL);
             Font correctFont = new Font(baseFont, 10, Font.BOLD, BaseColor.BLUE);
             Font wrongFont = new Font(baseFont, 10, Font.BOLD, BaseColor.RED);
 
-            // [PDF 내용 채우기]
-            document.add(new Paragraph(request.getTitle() != null ? request.getTitle() : "Learning Report", titleFont));
+            // =========================
+            // PDF 내용
+            // =========================
+            document.add(new Paragraph(
+                    request.getTitle() != null ? request.getTitle() : "Learning Report",
+                    titleFont
+            ));
             document.add(new Paragraph("Target: " + objectName, bodyFont));
             document.add(new Paragraph("--------------------------------------------------", bodyFont));
 
@@ -116,19 +129,33 @@ public class PdfExportService {
             document.add(new Paragraph(summaryText, bodyFont));
 
             document.add(new Paragraph("\n3. Quiz Review", sectionFont));
+
             if (quizList != null && !quizList.isEmpty()) {
                 for (int i = 0; i < quizList.size(); i++) {
                     QuizAnswer q = quizList.get(i);
-                    document.add(new Paragraph("\nQ" + (i+1) + ". " + q.getQuestion(), bodyFont));
-                    
-                    Paragraph result = new Paragraph("Your Answer: " + q.getUserAnswer() + " / Correct: " + q.getCorrectAnswer(), bodyFont);
+
+                    document.add(new Paragraph(
+                            "\nQ" + (i + 1) + ". " + q.getQuestion(),
+                            bodyFont
+                    ));
+
+                    Paragraph result = new Paragraph(
+                            "Your Answer: " + q.getUserAnswer()
+                                    + " / Correct: " + q.getCorrectAnswer(),
+                            bodyFont
+                    );
+
                     if (q.isCorrect()) {
                         result.add(new Chunk(" [CORRECT]", correctFont));
                     } else {
                         result.add(new Chunk(" [WRONG]", wrongFont));
                     }
+
                     document.add(result);
-                    document.add(new Paragraph("Explanation: " + q.getExplanation(), new Font(baseFont, 9, Font.ITALIC)));
+                    document.add(new Paragraph(
+                            "Explanation: " + q.getExplanation(),
+                            new Font(baseFont, 9, Font.ITALIC)
+                    ));
                 }
             } else {
                 document.add(new Paragraph("No quiz data available.", bodyFont));
@@ -136,8 +163,8 @@ public class PdfExportService {
 
             document.close();
         } catch (Exception e) {
-            log.error("PDF 생성 중 치명적 오류", e);
-            throw new RuntimeException("PDF 생성 실패했습니다.");
+            log.error("❌ PDF 생성 중 치명적 오류", e);
+            throw new RuntimeException("PDF 생성 실패");
         }
 
         return out.toByteArray();
