@@ -49,15 +49,18 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(f -> f.sameOrigin()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/", "/login", "/h2-console/**", 
-                    "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**",
-                    "/auth/**", "/api/auth/**", "/api/user/**", 
-                    "/api/objects/**", "/api/object-data/**",
-                    "/health"
-                ).permitAll()
-                .anyRequest().permitAll()
-            )
+            .requestMatchers(
+                "/", "/login",
+                "/health",
+                "/actuator/health",
+                "/h2-console/**",
+                "/swagger-ui/**", "/swagger-ui.html",
+                "/v3/api-docs/**", "/api-docs/**",
+                "/auth/**", "/api/auth/**", "/api/user/**",
+                "/api/objects/**", "/api/object-data/**"
+            ).permitAll()
+        .anyRequest().authenticated()
+)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
