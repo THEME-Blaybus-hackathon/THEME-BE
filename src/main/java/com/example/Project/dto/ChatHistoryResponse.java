@@ -4,6 +4,7 @@ import com.example.Project.entity.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * 대화 히스토리 조회 Response DTO
  */
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class ChatHistoryResponse {
     private List<MessageDto> messages;
     private int totalMessages;
 
-    @Data
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

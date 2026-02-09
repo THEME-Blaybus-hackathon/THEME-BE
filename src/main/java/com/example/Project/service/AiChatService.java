@@ -8,6 +8,8 @@ import com.example.Project.entity.ChatSession;
 import com.example.Project.entity.User;
 import com.example.Project.exception.ChatProcessingException;
 import com.example.Project.exception.SessionNotFoundException;
+import com.example.Project.repository.ChatSessionRepository;
+import com.example.Project.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class AiChatService {
     private final ChatService chatService;
     private final OpenAiService openAiService;
     private final PromptService promptService;
+    private final ChatSessionRepository chatSessionRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * AI 채팅 처리 (개선된 버전)
@@ -141,6 +145,24 @@ public class AiChatService {
     @Transactional
     public void deleteSession(String sessionId, User user) {
         chatService.deleteSession(sessionId, user);
+    }
+
+    /**
+     * userId, objectName 기반 전체 세션+대화 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ChatHistoryResponse> getAllChatHistoryByObjectForUser(Long userId, String objectName) {
+        List<ChatSession> sessions = chatSessionRepository.findByUserIdAndObjectNameOrderByCreatedAtDesc(userId, objectName);
+        List<ChatHistoryResponse> result = new ArrayList<>();
+        for (ChatSession session : sessions) {
+            List<ChatMessage> messages = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId());
+            result.add(ChatHistoryResponse.from(
+                session.getSessionId(),
+                session.getObjectName(),
+                messages
+            ));
+        }
+        return result;
     }
 
     /**

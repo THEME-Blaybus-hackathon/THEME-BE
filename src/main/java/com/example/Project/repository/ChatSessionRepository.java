@@ -45,4 +45,10 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
      */
     @Query("SELECT MAX(CAST(SUBSTRING(cs.sessionId, 10, 3) AS int)) FROM ChatSession cs WHERE cs.sessionId LIKE CONCAT(:datePrefix, '-%')")
     Integer findMaxSequenceByDatePrefix(@Param("datePrefix") String datePrefix);
+
+    /**
+     * User id와 objectName으로 세션 전체 조회
+     */
+    @Query("SELECT s FROM ChatSession s WHERE s.user.id = :userId AND s.objectName = :objectName ORDER BY s.createdAt DESC")
+    List<ChatSession> findByUserIdAndObjectNameOrderByCreatedAtDesc(@Param("userId") Long userId, @Param("objectName") String objectName);
 }

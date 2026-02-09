@@ -97,7 +97,7 @@ public class PdfExportService {
             BaseFont baseFont;
             try {
                 baseFont = BaseFont.createFont(
-                        "fonts/NanumGothic.ttf",
+                        "font/NanumGothic.ttf",
                         BaseFont.IDENTITY_H,
                         BaseFont.EMBEDDED
                 );
