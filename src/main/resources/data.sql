@@ -1,7 +1,7 @@
 INSERT INTO learning_object_categories (id, main_image_url) VALUES
 ('suspension', '/asset/suspension/main_image.png'),
-('robot_gripper', '/asset/robot_gripper/main_image.png'),
-('robot_arm', '/asset/robot_arm/main_image.png'),
+('gripper', '/asset/robot_gripper/main_image.png'),
+('arm', '/asset/robot_arm/main_image.png'),
 ('drone', '/asset/drone/main_image.png')
 ON CONFLICT (id) DO NOTHING;
 
@@ -18,27 +18,27 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO learning_objects
 (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
-(20, 'Base Plate', '로봇 그리퍼를 바닥에 고정하는 메인 판', '/asset/robot_gripper/base_plate.glb', '/asset/robot_gripper/base_plate.glb', 'base_plate', 'robot_gripper'),
-(21, 'Base Mounting Bracket', '베이스와 그리퍼 본체를 연결하는 브라켓', '/asset/robot_gripper/base_bracket.glb', '/asset/robot_gripper/base_bracket.glb', 'bracket', 'robot_gripper'),
-(22, 'Gear Link A', '동력을 전달하는 첫 번째 기어 링크', '/asset/robot_gripper/gear_link_1.glb', '/asset/robot_gripper/gear_link_1.glb', 'gear_link_1', 'robot_gripper'),
-(23, 'Gear Link B', '맞물려 돌아가는 두 번째 기어 링크', '/asset/robot_gripper/gear_link_2.glb', '/asset/robot_gripper/gear_link_2.glb', 'gear_link_2', 'robot_gripper'),
-(24, 'Connecting Link', '관절을 이어주는 연결 링크', '/asset/robot_gripper/link.glb', '/asset/robot_gripper/link.glb', 'link', 'robot_gripper'),
-(25, 'Gripper Jaw', '물체를 실제로 집는 집게 부분', '/asset/robot_gripper/gripper.glb', '/asset/robot_gripper/gripper.glb', 'Gripper', 'robot_gripper'),
-(26, 'Fixing Pin', '각 부품을 고정하는 회전 핀', '/asset/robot_gripper/pin.glb', '/asset/robot_gripper/pin.glb', 'pin', 'robot_gripper'),
-(27, 'Base Gear', '베이스 부분에 위치한 기어 부품', '/asset/robot_gripper/base_gear.glb', '/asset/robot_gripper/base_gear.glb', 'base_gear', 'robot_gripper')
+(20, 'Base Plate', '로봇 그리퍼를 바닥에 고정하는 메인 판', '/asset/robot_gripper/base_plate.glb', '/asset/robot_gripper/base_plate.glb', 'base_plate', 'gripper'),
+(21, 'Base Mounting Bracket', '베이스와 그리퍼 본체를 연결하는 브라켓', '/asset/robot_gripper/base_bracket.glb', '/asset/robot_gripper/base_bracket.glb', 'bracket', 'gripper'),
+(22, 'Gear Link A', '동력을 전달하는 첫 번째 기어 링크', '/asset/robot_gripper/gear_link_1.glb', '/asset/robot_gripper/gear_link_1.glb', 'gear_link_1', 'gripper'),
+(23, 'Gear Link B', '맞물려 돌아가는 두 번째 기어 링크', '/asset/robot_gripper/gear_link_2.glb', '/asset/robot_gripper/gear_link_2.glb', 'gear_link_2', 'gripper'),
+(24, 'Connecting Link', '관절을 이어주는 연결 링크', '/asset/robot_gripper/link.glb', '/asset/robot_gripper/link.glb', 'link', 'gripper'),
+(25, 'Gripper Jaw', '물체를 실제로 집는 집게 부분', '/asset/robot_gripper/gripper.glb', '/asset/robot_gripper/gripper.glb', 'Gripper', 'gripper'),
+(26, 'Fixing Pin', '각 부품을 고정하는 회전 핀', '/asset/robot_gripper/pin.glb', '/asset/robot_gripper/pin.glb', 'pin', 'gripper'),
+(27, 'Base Gear', '베이스 부분에 위치한 기어 부품', '/asset/robot_gripper/base_gear.glb', '/asset/robot_gripper/base_gear.glb', 'base_gear', 'gripper')
 ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO learning_objects
 (id, name, description, model_url, assembly_url, mesh_name, category_id) VALUES
-(30, 'Robot Base', '로봇 팔의 회전 바닥 (Base)', '/asset/robot_arm/base.glb', '/asset/robot_arm/base.glb', 'base', 'robot_arm'),
-(31, 'Arm Part 2', '로봇 팔 연결 부품 2', '/asset/robot_arm/part_2.glb', '/asset/robot_arm/part_2.glb', 'part_2', 'robot_arm'),
-(32, 'Arm Part 3', '로봇 팔 연결 부품 3', '/asset/robot_arm/part_3.glb', '/asset/robot_arm/part_3.glb', 'part_3', 'robot_arm'),
-(33, 'Arm Part 4', '로봇 팔 연결 부품 4', '/asset/robot_arm/part_4.glb', '/asset/robot_arm/part_4.glb', 'part_4', 'robot_arm'),
-(34, 'Arm Part 5', '로봇 팔 연결 부품 5', '/asset/robot_arm/part_5.glb', '/asset/robot_arm/part_5.glb', 'part_5', 'robot_arm'),
-(35, 'Arm Part 6', '로봇 팔 연결 부품 6', '/asset/robot_arm/part_6.glb', '/asset/robot_arm/part_6.glb', 'part_6', 'robot_arm'),
-(36, 'Arm Part 7', '로봇 팔 연결 부품 7', '/asset/robot_arm/part_7.glb', '/asset/robot_arm/part_7.glb', 'part_7', 'robot_arm'),
-(37, 'Arm Part 8', '로봇 팔 연결 부품 8', '/asset/robot_arm/part_8.glb', '/asset/robot_arm/part_8.glb', 'part_8', 'robot_arm')
+(30, 'Robot Base', '로봇 팔의 회전 바닥 (Base)', '/asset/robot_arm/base.glb', '/asset/robot_arm/base.glb', 'base', 'arm'),
+(31, 'Arm Part 2', '로봇 팔 연결 부품 2', '/asset/robot_arm/part_2.glb', '/asset/robot_arm/part_2.glb', 'part_2', 'arm'),
+(32, 'Arm Part 3', '로봇 팔 연결 부품 3', '/asset/robot_arm/part_3.glb', '/asset/robot_arm/part_3.glb', 'part_3', 'arm'),
+(33, 'Arm Part 4', '로봇 팔 연결 부품 4', '/asset/robot_arm/part_4.glb', '/asset/robot_arm/part_4.glb', 'part_4', 'arm'),
+(34, 'Arm Part 5', '로봇 팔 연결 부품 5', '/asset/robot_arm/part_5.glb', '/asset/robot_arm/part_5.glb', 'part_5', 'arm'),
+(35, 'Arm Part 6', '로봇 팔 연결 부품 6', '/asset/robot_arm/part_6.glb', '/asset/robot_arm/part_6.glb', 'part_6', 'arm'),
+(36, 'Arm Part 7', '로봇 팔 연결 부품 7', '/asset/robot_arm/part_7.glb', '/asset/robot_arm/part_7.glb', 'part_7', 'arm'),
+(37, 'Arm Part 8', '로봇 팔 연결 부품 8', '/asset/robot_arm/part_8.glb', '/asset/robot_arm/part_8.glb', 'part_8', 'arm')
 ON CONFLICT (id) DO NOTHING;
 
 
