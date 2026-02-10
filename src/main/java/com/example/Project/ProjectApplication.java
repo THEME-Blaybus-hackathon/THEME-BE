@@ -2,18 +2,20 @@ package com.example.Project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+@EnableJpaAuditing // ★ [필수] JPA Auditing 기능 활성화
 @SpringBootApplication
 public class ProjectApplication {
 
     public static void main(String[] args) {
-        loadEnv();
-
+        loadEnv(); // .env 로드
         SpringApplication.run(ProjectApplication.class, args);
     }
 
+    // 기존 환경변수 로드 로직 유지
     private static void loadEnv() {
         try {
             Dotenv dotenv = Dotenv.configure()

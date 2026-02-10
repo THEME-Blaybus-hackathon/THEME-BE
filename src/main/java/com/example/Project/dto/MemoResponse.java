@@ -14,7 +14,8 @@ public class MemoResponse {
     private String title;
     private String content;
     private String partName;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // 생성일
+    private LocalDateTime updatedAt; // 수정일
 
     public MemoResponse(Memo memo) {
         this.id = memo.getId();
@@ -22,5 +23,6 @@ public class MemoResponse {
         this.content = memo.getContent();
         this.partName = memo.getPartName();
         this.createdAt = memo.getCreatedAt();
+        this.updatedAt = memo.getUpdatedAt(); // ★ 엔티티에서 가져오기
     }
 }
